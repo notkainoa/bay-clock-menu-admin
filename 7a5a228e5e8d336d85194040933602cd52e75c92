@@ -1,0 +1,23 @@
+server/utils/secrets.ts
+  3cb99f7148c162ca 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "7a5a228e5e8d336d85194040933602cd52e75c92",
+  "prompts": {
+    "3cb99f7148c162ca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cfd5c-f62f-7323-b509-9feb97ff8697",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
