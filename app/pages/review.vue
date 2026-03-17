@@ -15,8 +15,7 @@ const previewMeta = computed(() => {
     return ''
   }
 
-  const kindLabel = menuAdmin.preview.value.kind === 'pdf' ? 'PDF' : 'JPG'
-  return `${menuAdmin.selectedFile.value.name} · ${kindLabel}`
+  return menuAdmin.selectedFile.value.name
 })
 
 async function handleReplace(file: File) {
