@@ -356,10 +356,12 @@ async function githubRequest(event: H3Event, path: string, init: RequestInit = {
 
 async function githubError(response: Response, context: string) {
   const detail = await response.text()
+  const message = `${context}: GitHub API ${response.status} ${detail}`
   return createError({
     statusCode: response.status,
-    statusMessage: `${context}: GitHub API ${response.status} ${detail}`,
-    data: { error: `${context}: GitHub API ${response.status} ${detail}` },
+    statusMessage: 'GitHub API request failed',
+    message,
+    data: { error: message },
   })
 }
 
