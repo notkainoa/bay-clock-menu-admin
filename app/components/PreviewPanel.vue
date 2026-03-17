@@ -9,7 +9,8 @@ const props = defineProps<{
 }>()
 
 const borderClass = computed(() => {
-  if (props.tone === 'green') return 'border-accent/30'
+  if (props.tone === 'green') return 'border-dashed border-green-500/80'
+  if (props.tone === 'red') return 'border-dashed border-red-500/80'
   return 'border-border'
 })
 </script>
@@ -22,7 +23,7 @@ const borderClass = computed(() => {
       <a v-if="props.href" class="text-xs text-text-secondary hover:text-text-primary" :href="props.href" target="_blank" rel="noreferrer">Open</a>
     </div>
 
-    <div :class="['flex min-h-[360px] items-center justify-center overflow-hidden rounded-sm border bg-surface-inset', borderClass]">
+    <div :class="['flex min-h-[360px] items-center justify-center overflow-hidden rounded-sm border-2 bg-surface-inset', borderClass]">
       <img v-if="props.src" :src="props.src" :alt="props.alt" class="h-full w-full object-contain">
       <span v-else class="text-xs text-text-muted">No preview</span>
     </div>
