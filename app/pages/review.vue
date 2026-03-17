@@ -87,7 +87,7 @@ async function logout() {
         input-id="replace-upload"
         compact
         :busy="menuAdmin.previewBusy.value || menuAdmin.confirmBusy.value"
-        label="Replace file"
+        label="Use different menu file"
         subtitle="pdf, jpg, jpeg"
         @select="handleReplace"
       />

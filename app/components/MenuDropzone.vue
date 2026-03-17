@@ -68,7 +68,7 @@ function handleKeydown(event: KeyboardEvent) {
 
     <div :class="props.compact ? 'flex items-center justify-between gap-3' : 'flex flex-col items-center gap-3 text-center'">
       <div class="flex items-center gap-3">
-        <Icon name="upload" :class="['shrink-0', props.compact ? 'size-4 text-text-secondary' : 'size-5 text-text-secondary']" />
+        <Icon name="upload" class="size-6 shrink-0 text-text-secondary" />
         <div>
           <div :class="props.compact ? 'text-sm text-text-primary' : 'text-base text-text-primary'">{{ props.label }}</div>
           <div :class="props.compact ? 'text-xs text-text-muted' : 'mt-0.5 text-xs text-text-muted'">{{ props.subtitle }}</div>
