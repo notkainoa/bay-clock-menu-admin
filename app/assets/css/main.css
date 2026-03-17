@@ -16,11 +16,9 @@ body,
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 45%),
-    radial-gradient(circle at bottom, rgba(61, 162, 77, 0.08), transparent 35%),
-    #101010;
+  background: #030816;
   font-family: "Highway Gothic", ui-sans-serif, system-ui, sans-serif;
+  color: #f8fbff;
 }
 
 button,
@@ -35,33 +33,32 @@ select {
 }
 
 .chalk-text {
-  font-family: "Patrick Hand", cursive;
+  font-family: inherit;
 }
 
 .sketch-card {
   border-radius: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.88);
-  background: rgba(19, 19, 19, 0.82);
-  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(129, 146, 178, 0.28);
+  background: rgba(63, 76, 101, 0.36);
 }
 
 .sketch-dashed {
   border-radius: 1.75rem;
-  border: 4px dashed rgba(255, 255, 255, 0.78);
+  border: 2px dashed rgba(129, 146, 178, 0.65);
 }
 
 .sketch-red {
-  border-color: rgba(235, 141, 144, 0.95);
+  border-color: rgba(129, 146, 178, 0.6);
 }
 
 .sketch-green {
-  border-color: rgba(61, 162, 77, 0.95);
+  border-color: rgba(126, 182, 255, 0.7);
 }
 
 .sketch-button {
-  @apply rounded-2xl border border-white/70 bg-white/5 px-5 py-3 text-base text-ink transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60;
+  @apply rounded-full border border-[#64748b]/60 bg-[#45556f] px-5 py-3 text-base text-white transition hover:bg-[#52647f] disabled:cursor-not-allowed disabled:opacity-60;
 }
 
 .sketch-button-primary {
-  @apply rounded-2xl border border-transparent bg-moss px-5 py-3 text-base text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+  @apply rounded-full border border-transparent bg-[#6ca9ff] px-5 py-3 text-base text-[#031124] transition hover:bg-[#82b6ff] disabled:cursor-not-allowed disabled:opacity-60;
 }

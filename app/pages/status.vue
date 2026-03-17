@@ -55,7 +55,7 @@ async function uploadAnother() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen w-full max-w-[1400px] items-center px-5 py-7 sm:px-8 sm:py-10">
+  <main class="mx-auto flex min-h-screen w-full max-w-[1320px] items-center px-5 py-8 sm:px-8 sm:py-10">
     <StatusCard
       :stage="status?.stage || 'Queued'"
       :detail="statusError || status?.detail || 'Waiting for GitHub Actions to pick up the upload.'"
@@ -63,12 +63,12 @@ async function uploadAnother() {
       :run-url="status?.run?.url"
     >
       <div class="flex flex-col gap-3 sm:flex-row">
-        <button class="sketch-button w-full chalk-text text-2xl leading-none sm:w-auto" type="button" @click="uploadAnother">
+        <button class="sketch-button w-full text-sm sm:w-auto" type="button" @click="uploadAnother">
           Upload another menu
         </button>
         <a
           v-if="status?.stage === 'Done'"
-          class="sketch-button-primary w-full text-center font-display text-xl uppercase tracking-[0.16em]"
+          class="sketch-button-primary w-full text-center text-sm uppercase tracking-[0.16em]"
           :href="liveMenuUrl"
           target="_blank"
           rel="noreferrer"

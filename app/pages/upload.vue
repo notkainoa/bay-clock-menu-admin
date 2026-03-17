@@ -28,31 +28,31 @@ async function logout() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-5 py-7 sm:px-8 sm:py-10">
-    <div class="mb-6 flex items-center justify-between gap-4">
+  <main class="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col px-5 py-8 sm:px-8 sm:py-10">
+    <div class="mb-8 flex items-center justify-between gap-4">
       <div>
-        <p class="text-sm uppercase tracking-[0.3em] text-chalk">Bay Clock</p>
-        <h1 class="font-display text-4xl uppercase tracking-tight text-ink sm:text-5xl">Menu Admin</h1>
+        <p class="text-sm uppercase tracking-[0.3em] text-[#95a6c7]">Bay Clock</p>
+        <h1 class="font-display text-4xl tracking-tight text-white sm:text-5xl">Menu Admin</h1>
       </div>
-      <button class="sketch-button inline-flex items-center gap-2 chalk-text text-2xl leading-none" type="button" @click="logout">
+      <button class="sketch-button inline-flex items-center gap-2 text-sm" type="button" @click="logout">
         <Icon name="logout" class="size-5" />
         Log out
       </button>
     </div>
 
-    <section class="sketch-card flex flex-1 flex-col justify-center p-6 sm:p-10">
+    <section class="flex flex-1 flex-col justify-center rounded-[2rem] border border-white/10 bg-[#3f4c65]/20 p-6 sm:p-10">
       <MenuDropzone
         input-id="menu-upload"
         :busy="menuAdmin.previewBusy.value"
         label="Drop menu here"
-        subtitle="pdf, jpg, jpeg"
+        subtitle="PDF, JPG, JPEG"
         helper="Nothing gets written until you confirm the review."
         @select="handleSelect"
       />
 
       <div class="mt-5 space-y-2">
-        <p class="chalk-text text-2xl leading-none text-chalk">Accepted types: PDF, JPG, JPEG.</p>
-        <p v-if="pageError || menuAdmin.uploadError.value" class="chalk-text text-2xl leading-none text-rose">
+        <p class="text-sm text-[#95a6c7]">Accepted types: PDF, JPG, JPEG.</p>
+        <p v-if="pageError || menuAdmin.uploadError.value" class="text-sm text-[#f2a8ae]">
           {{ pageError || menuAdmin.uploadError.value }}
         </p>
       </div>

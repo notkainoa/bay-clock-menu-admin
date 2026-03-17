@@ -50,9 +50,9 @@ function handleKeydown(event: KeyboardEvent) {
   <label
     :for="props.inputId"
     :class="[
-      'block cursor-pointer rounded-[2rem] border-4 border-dashed border-white/80 bg-white/[0.02] transition',
+      'block cursor-pointer rounded-[2rem] border-2 border-dashed border-[#7f8daa] bg-[#0b1324]/55 transition',
       props.compact ? 'px-5 py-4' : 'px-6 py-12 sm:px-10 sm:py-16',
-      dragging ? 'border-moss bg-moss/10' : 'hover:bg-white/[0.05]',
+      dragging ? 'border-[#7eb6ff] bg-[#10203d]' : 'hover:border-[#9eabc4] hover:bg-[#0f182d]',
     ]"
     role="button"
     tabindex="0"
@@ -66,19 +66,19 @@ function handleKeydown(event: KeyboardEvent) {
 
     <div :class="props.compact ? 'flex flex-col gap-3 md:flex-row md:items-center md:justify-between' : 'flex flex-col items-center gap-4 text-center'">
       <div class="flex items-center gap-4">
-        <Icon name="upload" class="size-8 text-ink" />
+        <Icon name="upload" class="size-8 text-[#dfe8f8]" />
         <div>
-          <div class="font-display text-2xl uppercase tracking-tight text-ink sm:text-3xl">{{ props.label }}</div>
-          <div class="chalk-text text-2xl leading-none text-chalk">{{ props.subtitle }}</div>
+          <div class="font-display text-2xl tracking-tight text-white sm:text-3xl">{{ props.label }}</div>
+          <div class="text-base text-[#95a6c7]">{{ props.subtitle }}</div>
         </div>
       </div>
 
       <div :class="props.compact ? 'flex items-center gap-3' : 'flex flex-col items-center gap-3'">
-        <span class="sketch-button inline-flex items-center gap-2 chalk-text text-2xl leading-none">
+        <span class="sketch-button inline-flex items-center gap-2 text-base">
           <Icon name="folder" class="size-5" />
-          {{ props.busy ? 'Working...' : 'or browse' }}
+          {{ props.busy ? 'Working...' : 'Browse files' }}
         </span>
-        <span class="chalk-text text-xl leading-none text-chalk">{{ props.helper }}</span>
+        <span class="text-sm text-[#95a6c7]">{{ props.helper }}</span>
       </div>
     </div>
   </label>

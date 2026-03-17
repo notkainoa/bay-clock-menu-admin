@@ -69,19 +69,19 @@ async function logout() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-5 py-7 sm:px-8 sm:py-10">
-    <div class="mb-6 flex items-center justify-between gap-4">
+  <main class="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col px-5 py-8 sm:px-8 sm:py-10">
+    <div class="mb-8 flex items-center justify-between gap-4">
       <div>
-        <p class="text-sm uppercase tracking-[0.3em] text-chalk">Review</p>
-        <h1 class="font-display text-4xl uppercase tracking-tight text-ink sm:text-5xl">Compare before publish</h1>
+        <p class="text-sm uppercase tracking-[0.3em] text-[#95a6c7]">Review</p>
+        <h1 class="font-display text-4xl tracking-tight text-white sm:text-5xl">Compare before publish</h1>
       </div>
-      <button class="sketch-button inline-flex items-center gap-2 chalk-text text-2xl leading-none" type="button" @click="logout">
+      <button class="sketch-button inline-flex items-center gap-2 text-sm" type="button" @click="logout">
         <Icon name="logout" class="size-5" />
         Log out
       </button>
     </div>
 
-    <section class="sketch-card flex flex-1 flex-col gap-6 p-6 sm:p-8">
+    <section class="flex flex-1 flex-col gap-6 rounded-[2rem] border border-white/10 bg-[#3f4c65]/20 p-6 sm:p-8">
       <MenuDropzone
         input-id="replace-upload"
         compact
@@ -102,14 +102,14 @@ async function logout() {
       />
 
       <div class="mt-auto space-y-4">
-        <p v-if="menuAdmin.reviewError.value" class="chalk-text text-2xl leading-none text-rose">{{ menuAdmin.reviewError.value }}</p>
+        <p v-if="menuAdmin.reviewError.value" class="text-sm text-[#f2a8ae]">{{ menuAdmin.reviewError.value }}</p>
 
         <div class="flex flex-col gap-3 sm:flex-row">
-          <button class="sketch-button w-full chalk-text text-2xl leading-none sm:w-auto" type="button" @click="chooseAnother">
+          <button class="sketch-button w-full text-sm sm:w-auto" type="button" @click="chooseAnother">
             Choose another file
           </button>
-          <button class="sketch-button-primary w-full font-display text-xl uppercase tracking-[0.16em]" :disabled="menuAdmin.confirmBusy.value" type="button" @click="handleConfirm">
-            {{ menuAdmin.confirmBusy.value ? 'Publishing...' : 'Commit & Deploy' }}
+          <button class="sketch-button-primary w-full text-sm uppercase tracking-[0.16em]" :disabled="menuAdmin.confirmBusy.value" type="button" @click="handleConfirm">
+            {{ menuAdmin.confirmBusy.value ? 'Publishing...' : 'Confirm upload' }}
           </button>
         </div>
       </div>
