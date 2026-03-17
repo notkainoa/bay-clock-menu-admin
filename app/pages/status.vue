@@ -58,9 +58,9 @@ async function uploadAnother() {
   <main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
     <header class="flex items-center justify-between border-b border-border pb-4">
       <div class="flex items-baseline gap-2">
-        <span class="text-xs uppercase tracking-[0.15em] text-text-muted">Bay Clock</span>
+        <span class="text-xs uppercase tracking-[0.15em] text-text-muted">Bay Clock Studio</span>
         <span class="text-xs text-text-muted">/</span>
-        <h1 class="font-display text-base text-text-primary">Status</h1>
+        <h1 class="font-display text-base text-text-primary">Menu</h1>
       </div>
     </header>
 
