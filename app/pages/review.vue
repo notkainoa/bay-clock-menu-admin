@@ -98,9 +98,14 @@ async function logout() {
         :preview-meta="previewMeta"
       />
 
-      <div class="flex items-center justify-between border-t border-border pt-4">
+    </div>
+
+    <!-- Spacer so content scrolls clear of the fixed action bar -->
+    <div class="h-20" />
+
+    <div class="fixed inset-x-0 bottom-0 z-50">
+      <div class="mx-auto flex max-w-5xl items-center justify-end gap-3 px-4 py-4">
         <p v-if="menuAdmin.reviewError.value" class="text-xs text-danger">{{ menuAdmin.reviewError.value }}</p>
-        <span v-else />
 
         <div class="flex gap-2">
           <button class="btn text-xs" type="button" @click="chooseAnother">
