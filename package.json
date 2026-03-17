@@ -1,0 +1,30 @@
+{
+  "name": "bay-clock-menu-admin",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "deploy": "nuxt build && wrangler deploy",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20260317.1",
+    "@fontsource/patrick-hand": "^5.2.8",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "lucide-vue-next": "^0.577.0",
+    "nuxt": "^4.4.2",
+    "pdfjs-dist": "^5.5.207",
+    "vue": "^3.5.30",
+    "vue-router": "^5.0.3",
+    "wrangler": "^4.74.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@vue/language-core": "^3.2.5",
+    "vue-tsc": "^3.2.5"
+  }
+}

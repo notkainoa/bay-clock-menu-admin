@@ -1,0 +1,67 @@
+@font-face {
+  font-family: "Highway Gothic";
+  src: url("../fonts/HWGW.woff") format("woff");
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#__nuxt {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 45%),
+    radial-gradient(circle at bottom, rgba(61, 162, 77, 0.08), transparent 35%),
+    #101010;
+  font-family: "Highway Gothic", ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.chalk-text {
+  font-family: "Patrick Hand", cursive;
+}
+
+.sketch-card {
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  background: rgba(19, 19, 19, 0.82);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+}
+
+.sketch-dashed {
+  border-radius: 1.75rem;
+  border: 4px dashed rgba(255, 255, 255, 0.78);
+}
+
+.sketch-red {
+  border-color: rgba(235, 141, 144, 0.95);
+}
+
+.sketch-green {
+  border-color: rgba(61, 162, 77, 0.95);
+}
+
+.sketch-button {
+  @apply rounded-2xl border border-white/70 bg-white/5 px-5 py-3 text-base text-ink transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.sketch-button-primary {
+  @apply rounded-2xl border border-transparent bg-moss px-5 py-3 text-base text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+}
