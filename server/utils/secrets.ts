@@ -8,7 +8,7 @@ export function readSecret(event: H3Event, value: string | undefined, preferredN
   }
 
   const env = getCloudflareEnv(event)
-  for (const name of legacyNames) {
+  for (const name of [preferredName, ...legacyNames]) {
     const candidate = env[name]
     if (typeof candidate === 'string' && candidate.length > 0) {
       return candidate
