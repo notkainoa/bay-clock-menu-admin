@@ -1,13 +1,15 @@
 import { createError, readBody } from 'h3'
 import { createSession } from '../utils/session'
+import { readSecret } from '../utils/secrets'
 
 export default defineEventHandler(async event => {
   const body = await readBody<{ code?: string, trustBrowser?: boolean }>(event)
   const code = typeof body?.code === 'string' ? body.code.trim() : ''
   const trustBrowser = body?.trustBrowser === true
   const runtimeConfig = useRuntimeConfig(event)
+  const password = readSecret(event, runtimeConfig.menuUploadPassword, 'NUXT_MENU_UPLOAD_PASSWORD', ['MENU_UPLOAD_PASSWORD'])
 
-  if (!(await secureEqual(code, runtimeConfig.menuUploadPassword || ''))) {
+  if (!(await secureEqual(code, password))) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Invalid access code',

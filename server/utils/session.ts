@@ -1,4 +1,5 @@
 import { createError, deleteCookie, getCookie, getRequestURL, setCookie, type H3Event } from 'h3'
+import { readSecret } from './secrets'
 
 const COOKIE_NAME = 'menu_admin_session'
 const TRUSTED_MAX_AGE = 60 * 60 * 24 * 30
@@ -17,7 +18,7 @@ export interface SessionState {
 
 export async function createSession(event: H3Event, trusted: boolean) {
   const runtimeConfig = useRuntimeConfig(event)
-  const secret = readRequiredSecret(runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET')
+  const secret = readSecret(event, runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET', ['SESSION_SIGNING_SECRET'])
   const maxAge = trusted ? TRUSTED_MAX_AGE : SESSION_MAX_AGE
   const secure = getRequestURL(event).protocol === 'https:'
   const payload: SessionPayload = {
@@ -72,7 +73,7 @@ export async function requireSession(event: H3Event) {
 
 async function readSession(event: H3Event): Promise<SessionPayload | null> {
   const runtimeConfig = useRuntimeConfig(event)
-  const secret = readRequiredSecret(runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET')
+  const secret = readSecret(event, runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET', ['SESSION_SIGNING_SECRET'])
   const rawCookie = getCookie(event, COOKIE_NAME)
   if (!rawCookie) {
     return null
@@ -95,19 +96,6 @@ async function readSession(event: H3Event): Promise<SessionPayload | null> {
 
   return decoded
 }
-
-function readRequiredSecret(value: string, envName: string) {
-  if (typeof value === 'string' && value.length > 0) {
-    return value
-  }
-
-  throw createError({
-    statusCode: 500,
-    statusMessage: `Missing required secret ${envName}`,
-    data: { error: `Missing required secret ${envName}` },
-  })
-}
-
 function encodePayload(payload: SessionPayload) {
   const json = JSON.stringify(payload)
   return base64UrlEncode(new TextEncoder().encode(json))

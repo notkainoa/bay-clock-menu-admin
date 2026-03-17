@@ -1,4 +1,5 @@
 import { createError, type H3Event } from 'h3'
+import { readSecret } from './secrets'
 
 const INBOX_DIR = '.menu-upload-inbox'
 const UPLOAD_PATH = `${INBOX_DIR}/upload`
@@ -331,15 +332,7 @@ function getFailureDetail(jobs: WorkflowJob[]) {
 
 async function githubRequest(event: H3Event, path: string, init: RequestInit = {}) {
   const config = useRuntimeConfig(event)
-  const token = config.githubToken
-
-  if (!token) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Missing required secret NUXT_GITHUB_TOKEN',
-      data: { error: 'Missing required secret NUXT_GITHUB_TOKEN' },
-    })
-  }
+  const token = readSecret(event, config.githubToken, 'NUXT_GITHUB_TOKEN', ['GITHUB_TOKEN'])
 
   return await fetch(`https://api.github.com/repos/${config.githubOwner}/${config.githubRepo}${path}`, {
     ...init,
