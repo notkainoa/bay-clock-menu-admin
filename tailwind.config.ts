@@ -4,23 +4,38 @@ export default <Partial<Config>>{
   theme: {
     extend: {
       colors: {
-        ink: '#f4efe4',
-        chalk: '#cec7bb',
-        void: '#101010',
-        panel: '#171717',
-        line: '#d8d2c7',
-        moss: '#3da24d',
-        rose: '#eb8d90',
-      },
-      boxShadow: {
-        glow: '0 20px 80px rgba(0, 0, 0, 0.35)',
-      },
-      borderRadius: {
-        '4xl': '2rem',
+        surface: {
+          DEFAULT: '#141414',
+          raised: '#1a1a1a',
+          inset: '#0c0c0c',
+        },
+        border: {
+          DEFAULT: '#262626',
+          subtle: '#1e1e1e',
+          focus: '#6ca9ff',
+        },
+        text: {
+          primary: '#e5e5e5',
+          secondary: '#737373',
+          muted: '#525252',
+        },
+        accent: {
+          DEFAULT: '#6ca9ff',
+          hover: '#82b6ff',
+          muted: '#6ca9ff20',
+        },
+        danger: {
+          DEFAULT: '#ef4444',
+          muted: '#ef444420',
+        },
+        success: {
+          DEFAULT: '#22c55e',
+          muted: '#22c55e20',
+        },
       },
       fontFamily: {
         display: ['Highway Gothic', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        hand: ['Patrick Hand', 'cursive'],
+        mono: ['SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'monospace'],
       },
     },
   },

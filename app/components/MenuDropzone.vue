@@ -50,9 +50,11 @@ function handleKeydown(event: KeyboardEvent) {
   <label
     :for="props.inputId"
     :class="[
-      'block cursor-pointer rounded-[2rem] border-2 border-dashed border-[#7f8daa] bg-[#0b1324]/55 transition',
-      props.compact ? 'px-5 py-4' : 'px-6 py-12 sm:px-10 sm:py-16',
-      dragging ? 'border-[#7eb6ff] bg-[#10203d]' : 'hover:border-[#9eabc4] hover:bg-[#0f182d]',
+      'block cursor-pointer rounded-sm border border-dashed transition',
+      props.compact ? 'px-3 py-3' : 'px-4 py-10',
+      dragging
+        ? 'border-accent bg-accent/5'
+        : 'border-border hover:border-text-muted hover:bg-surface-raised',
     ]"
     role="button"
     tabindex="0"
@@ -64,22 +66,19 @@ function handleKeydown(event: KeyboardEvent) {
   >
     <input :id="props.inputId" class="sr-only" type="file" accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg" @change="handleInput">
 
-    <div :class="props.compact ? 'flex flex-col gap-3 md:flex-row md:items-center md:justify-between' : 'flex flex-col items-center gap-4 text-center'">
-      <div class="flex items-center gap-4">
-        <Icon name="upload" class="size-8 text-[#dfe8f8]" />
+    <div :class="props.compact ? 'flex items-center justify-between gap-3' : 'flex flex-col items-center gap-3 text-center'">
+      <div class="flex items-center gap-3">
+        <Icon name="upload" :class="['shrink-0', props.compact ? 'size-4 text-text-secondary' : 'size-5 text-text-secondary']" />
         <div>
-          <div class="font-display text-2xl tracking-tight text-white sm:text-3xl">{{ props.label }}</div>
-          <div class="text-base text-[#95a6c7]">{{ props.subtitle }}</div>
+          <div :class="props.compact ? 'text-sm text-text-primary' : 'text-base text-text-primary'">{{ props.label }}</div>
+          <div :class="props.compact ? 'text-xs text-text-muted' : 'mt-0.5 text-xs text-text-muted'">{{ props.subtitle }}</div>
         </div>
       </div>
 
-      <div :class="props.compact ? 'flex items-center gap-3' : 'flex flex-col items-center gap-3'">
-        <span class="sketch-button inline-flex items-center gap-2 text-base">
-          <Icon name="folder" class="size-5" />
-          {{ props.busy ? 'Working...' : 'Browse files' }}
-        </span>
-        <span class="text-sm text-[#95a6c7]">{{ props.helper }}</span>
-      </div>
+      <span :class="props.compact ? 'btn text-xs' : 'btn text-sm'">
+        <Icon name="folder" class="size-3.5" />
+        {{ props.busy ? 'Working...' : 'Browse' }}
+      </span>
     </div>
   </label>
 </template>

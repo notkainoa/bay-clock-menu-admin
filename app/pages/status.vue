@@ -55,27 +55,37 @@ async function uploadAnother() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen w-full max-w-[1320px] items-center px-5 py-8 sm:px-8 sm:py-10">
-    <StatusCard
-      :stage="status?.stage || 'Queued'"
-      :detail="statusError || status?.detail || 'Waiting for GitHub Actions to pick up the upload.'"
-      :commit="commit"
-      :run-url="status?.run?.url"
-    >
-      <div class="flex flex-col gap-3 sm:flex-row">
-        <button class="sketch-button w-full text-sm sm:w-auto" type="button" @click="uploadAnother">
-          Upload another menu
-        </button>
-        <a
-          v-if="status?.stage === 'Done'"
-          class="sketch-button-primary w-full text-center text-sm uppercase tracking-[0.16em]"
-          :href="liveMenuUrl"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Open current live menu
-        </a>
+  <main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
+    <header class="flex items-center justify-between border-b border-border pb-4">
+      <div class="flex items-baseline gap-2">
+        <span class="text-xs uppercase tracking-[0.15em] text-text-muted">Bay Clock</span>
+        <span class="text-xs text-text-muted">/</span>
+        <h1 class="font-display text-base text-text-primary">Status</h1>
       </div>
-    </StatusCard>
+    </header>
+
+    <div class="flex flex-1 items-center py-12">
+      <StatusCard
+        :stage="status?.stage || 'Queued'"
+        :detail="statusError || status?.detail || 'Waiting for GitHub Actions to pick up the upload.'"
+        :commit="commit"
+        :run-url="status?.run?.url"
+      >
+        <div class="flex gap-2">
+          <button class="btn text-xs" type="button" @click="uploadAnother">
+            Upload another
+          </button>
+          <a
+            v-if="status?.stage === 'Done'"
+            class="btn-primary text-xs"
+            :href="liveMenuUrl"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View live menu
+          </a>
+        </div>
+      </StatusCard>
+    </div>
   </main>
 </template>

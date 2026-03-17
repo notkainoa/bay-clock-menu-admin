@@ -15,7 +15,7 @@ const previewMeta = computed(() => {
     return ''
   }
 
-  const kindLabel = menuAdmin.preview.value.kind === 'pdf' ? 'PDF preview' : 'JPG preview'
+  const kindLabel = menuAdmin.preview.value.kind === 'pdf' ? 'PDF' : 'JPG'
   return `${menuAdmin.selectedFile.value.name} · ${kindLabel}`
 })
 
@@ -69,26 +69,26 @@ async function logout() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col px-5 py-8 sm:px-8 sm:py-10">
-    <div class="mb-8 flex items-center justify-between gap-4">
-      <div>
-        <p class="text-sm uppercase tracking-[0.3em] text-[#95a6c7]">Review</p>
-        <h1 class="font-display text-4xl tracking-tight text-white sm:text-5xl">Compare before publish</h1>
+  <main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
+    <header class="flex items-center justify-between border-b border-border pb-4">
+      <div class="flex items-baseline gap-2">
+        <span class="text-xs uppercase tracking-[0.15em] text-text-muted">Bay Clock</span>
+        <span class="text-xs text-text-muted">/</span>
+        <h1 class="font-display text-base text-text-primary">Review</h1>
       </div>
-      <button class="sketch-button inline-flex items-center gap-2 text-sm" type="button" @click="logout">
-        <Icon name="logout" class="size-5" />
+      <button class="btn-ghost text-xs" type="button" @click="logout">
+        <Icon name="logout" class="size-3.5" />
         Log out
       </button>
-    </div>
+    </header>
 
-    <section class="flex flex-1 flex-col gap-6 rounded-[2rem] border border-white/10 bg-[#3f4c65]/20 p-6 sm:p-8">
+    <div class="mt-4 space-y-4">
       <MenuDropzone
         input-id="replace-upload"
         compact
         :busy="menuAdmin.previewBusy.value || menuAdmin.confirmBusy.value"
-        label="Upload different menu"
+        label="Replace file"
         subtitle="pdf, jpg, jpeg"
-        helper="Replace the current local preview before you publish."
         @select="handleReplace"
       />
 
@@ -97,22 +97,21 @@ async function logout() {
         :live-src="liveMenuUrl"
         :preview-src="menuAdmin.preview.value.src"
         :preview-meta="previewMeta"
-        :mode="menuAdmin.reviewMode.value"
-        @update:mode="menuAdmin.reviewMode.value = $event"
       />
 
-      <div class="mt-auto space-y-4">
-        <p v-if="menuAdmin.reviewError.value" class="text-sm text-[#f2a8ae]">{{ menuAdmin.reviewError.value }}</p>
+      <div class="flex items-center justify-between border-t border-border pt-4">
+        <p v-if="menuAdmin.reviewError.value" class="text-xs text-danger">{{ menuAdmin.reviewError.value }}</p>
+        <span v-else />
 
-        <div class="flex flex-col gap-3 sm:flex-row">
-          <button class="sketch-button w-full text-sm sm:w-auto" type="button" @click="chooseAnother">
-            Choose another file
+        <div class="flex gap-2">
+          <button class="btn text-xs" type="button" @click="chooseAnother">
+            Cancel
           </button>
-          <button class="sketch-button-primary w-full text-sm uppercase tracking-[0.16em]" :disabled="menuAdmin.confirmBusy.value" type="button" @click="handleConfirm">
-            {{ menuAdmin.confirmBusy.value ? 'Publishing...' : 'Confirm upload' }}
+          <button class="btn-primary text-xs" :disabled="menuAdmin.confirmBusy.value" type="button" @click="handleConfirm">
+            {{ menuAdmin.confirmBusy.value ? 'Publishing...' : 'Confirm change' }}
           </button>
         </div>
       </div>
-    </section>
+    </div>
   </main>
 </template>

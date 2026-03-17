@@ -16,9 +16,11 @@ body,
 
 body {
   margin: 0;
-  background: #030816;
+  background: #0a0a0a;
   font-family: "Highway Gothic", ui-sans-serif, system-ui, sans-serif;
-  color: #f8fbff;
+  color: #e5e5e5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -32,33 +34,28 @@ select {
   box-sizing: border-box;
 }
 
-.chalk-text {
-  font-family: inherit;
+/* --- Buttons --- */
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm border border-border bg-surface-raised px-3 py-2 text-sm text-text-primary transition hover:bg-[#222] disabled:cursor-not-allowed disabled:opacity-40;
 }
 
-.sketch-card {
-  border-radius: 2rem;
-  border: 1px solid rgba(129, 146, 178, 0.28);
-  background: rgba(63, 76, 101, 0.36);
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm border border-accent/30 bg-accent px-3 py-2 text-sm font-medium text-[#0a0a0a] transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40;
 }
 
-.sketch-dashed {
-  border-radius: 1.75rem;
-  border: 2px dashed rgba(129, 146, 178, 0.65);
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm border border-transparent px-3 py-2 text-sm text-text-secondary transition hover:bg-surface-raised hover:text-text-primary;
 }
 
-.sketch-red {
-  border-color: rgba(129, 146, 178, 0.6);
+/* --- Inputs --- */
+
+.input {
+  @apply w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus;
 }
 
-.sketch-green {
-  border-color: rgba(126, 182, 255, 0.7);
-}
+/* --- Utilities --- */
 
-.sketch-button {
-  @apply rounded-full border border-[#64748b]/60 bg-[#45556f] px-5 py-3 text-base text-white transition hover:bg-[#52647f] disabled:cursor-not-allowed disabled:opacity-60;
-}
-
-.sketch-button-primary {
-  @apply rounded-full border border-transparent bg-[#6ca9ff] px-5 py-3 text-base text-[#031124] transition hover:bg-[#82b6ff] disabled:cursor-not-allowed disabled:opacity-60;
+.divider {
+  @apply border-t border-border;
 }
