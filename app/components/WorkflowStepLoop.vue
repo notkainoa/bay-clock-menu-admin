@@ -2,6 +2,7 @@
 import type { StatusStage } from '../types/menu-admin'
 
 type DisplayStage = Exclude<StatusStage, 'Failed'>
+type StepTone = 'current' | 'near' | 'mid' | 'far' | 'fade'
 
 const props = defineProps<{
   stage: StatusStage
@@ -67,131 +68,129 @@ function lastIndexFor(stage: DisplayStage) {
 }
 
 const lastStableStage = ref<DisplayStage>(props.stage === 'Failed' ? 'Queued' : props.stage)
-const activeStepIndex = ref(props.stage === 'Done' ? lastIndexFor('Done') : firstIndexFor(lastStableStage.value))
-
-let timer: ReturnType<typeof setInterval> | null = null
-
-function stopLoop() {
-  if (!timer) return
-  clearInterval(timer)
-  timer = null
-}
-
-function startLoop() {
-  stopLoop()
-
-  if (props.stage === 'Failed' || props.stage === 'Done') {
-    return
-  }
-
-  timer = setInterval(() => {
-    const indices = STEP_INDICES_BY_STAGE[lastStableStage.value]
-
-    if (indices.length <= 1) {
-      return
-    }
-
-    const currentPosition = Math.max(0, indices.indexOf(activeStepIndex.value))
-    activeStepIndex.value = indices[(currentPosition + 1) % indices.length] ?? indices[0] ?? activeStepIndex.value
-  }, 1600)
-}
 
 watch(() => props.stage, (stage) => {
-  if (stage === 'Failed') {
-    stopLoop()
-    return
+  if (stage !== 'Failed') {
+    lastStableStage.value = stage
   }
-
-  lastStableStage.value = stage
-
-  if (stage === 'Done') {
-    activeStepIndex.value = lastIndexFor('Done')
-    stopLoop()
-    return
-  }
-
-  const stageIndices = STEP_INDICES_BY_STAGE[stage]
-  if (!stageIndices.includes(activeStepIndex.value)) {
-    activeStepIndex.value = firstIndexFor(stage)
-  }
-
-  startLoop()
-})
-
-onMounted(() => {
-  startLoop()
-})
-
-onBeforeUnmount(() => {
-  stopLoop()
 })
 
 const activeStage = computed<DisplayStage>(() => props.stage === 'Failed' ? lastStableStage.value : props.stage)
+const activeStepIndex = computed(() => props.stage === 'Done' ? lastIndexFor('Done') : firstIndexFor(activeStage.value))
+const title = 'Workflow'
+
+function stepTone(index: number): StepTone {
+  const distance = Math.abs(index - activeStepIndex.value)
+
+  if (distance === 0) return 'current'
+  if (distance === 1) return 'near'
+  if (distance === 2) return 'mid'
+  if (distance === 3) return 'far'
+  return 'fade'
+}
 
 function lineStyle(index: number) {
-  const delta = index - activeStepIndex.value
-  const distance = Math.abs(delta)
-  const opacity = delta < 0
-    ? Math.max(0.16, 0.5 - (distance * 0.09))
-    : delta > 0
-      ? Math.max(0.24, 0.76 - (distance * 0.08))
-      : 1
-  const translateX = delta < 0
-    ? Math.min(10, distance * 2)
-    : Math.min(14, distance * 2)
-  const scale = delta === 0 ? 1 : Math.max(0.96, 1 - (distance * 0.01))
+  if (props.stage === 'Failed' && index === activeStepIndex.value) {
+    return {
+      color: '#ef4444',
+      opacity: 1,
+    }
+  }
+
+  if (props.stage === 'Done' && index === activeStepIndex.value) {
+    return {
+      color: '#f5f5f5',
+      opacity: 1,
+    }
+  }
+
+  const tone = stepTone(index)
+
+  if (tone === 'current') {
+    return {
+      color: '#f5f5f5',
+      opacity: 1,
+    }
+  }
+
+  if (tone === 'near') {
+    return {
+      color: '#a3a3a3',
+      opacity: 0.95,
+    }
+  }
+
+  if (tone === 'mid') {
+    return {
+      color: '#737373',
+      opacity: 0.82,
+    }
+  }
+
+  if (tone === 'far') {
+    return {
+      color: '#525252',
+      opacity: 0.68,
+    }
+  }
 
   return {
-    opacity,
-    transform: `translateX(${translateX}px) scale(${scale})`,
+    color: '#404040',
+    opacity: 0.34,
   }
+}
+
+function iconName(index: number) {
+  if (index !== activeStepIndex.value) {
+    return null
+  }
+
+  if (props.stage === 'Failed') {
+    return 'close'
+  }
+
+  if (props.stage === 'Done') {
+    return 'check'
+  }
+
+  return 'spinner'
+}
+
+function iconClass() {
+  if (props.stage === 'Failed') {
+    return 'size-4 text-danger'
+  }
+
+  if (props.stage === 'Done') {
+    return 'size-4 text-success'
+  }
+
+  return 'size-4 animate-spin text-text-secondary'
 }
 </script>
 
 <template>
-  <div class="rounded-sm border border-border bg-surface p-3">
-    <p class="text-[10px] uppercase tracking-wider text-text-muted">Workflow steps</p>
+  <div class="space-y-3">
+    <p class="text-xs uppercase tracking-[0.15em] text-text-muted">{{ title }}</p>
 
-    <div class="mt-3 space-y-2">
+    <div class="space-y-2">
       <div
-        v-for="(step, index) in WORKFLOW_STEPS"
+      v-for="(step, index) in WORKFLOW_STEPS"
         :key="`${step.stage}-${index}`"
-        :class="[
-          'workflow-step flex items-start gap-3 rounded-sm border px-3 py-2',
-          index === activeStepIndex && props.stage !== 'Done' && props.stage !== 'Failed'
-            ? 'workflow-step--active border-accent/30 bg-accent-muted text-text-primary'
-            : index <= activeStepIndex
-              ? 'border-border-subtle bg-surface-inset text-text-secondary'
-              : 'border-border-subtle bg-transparent text-text-muted',
-          props.stage === 'Done' && index === activeStepIndex ? 'border-success/30 bg-success-muted text-text-primary' : '',
-          props.stage === 'Failed' && index === activeStepIndex ? 'border-danger/30 bg-danger-muted text-text-primary' : '',
-        ]"
+        class="workflow-step flex items-start gap-3 text-sm leading-5"
         :style="lineStyle(index)"
       >
-        <span
-          :class="[
-            'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-300',
-            index < activeStepIndex || props.stage === 'Done'
-              ? 'bg-text-secondary'
-              : index === activeStepIndex && props.stage === 'Failed'
-                ? 'bg-danger'
-                : index === activeStepIndex
-                  ? 'workflow-step__dot workflow-step__dot--active bg-accent'
-                  : 'bg-border',
-          ]"
-        />
+        <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
+          <Icon
+            v-if="iconName(index)"
+            :name="iconName(index)!"
+            :class="iconClass()"
+          />
+        </span>
 
-        <div class="min-w-0">
-          <p class="text-sm leading-5">
-            {{ step.label }}
-          </p>
-          <p
-            v-if="step.stage === activeStage && index === activeStepIndex"
-            class="mt-1 text-[10px] uppercase tracking-[0.14em]"
-          >
-            {{ step.stage }}
-          </p>
-        </div>
+        <p class="min-w-0">
+          {{ step.label }}
+        </p>
       </div>
     </div>
   </div>
@@ -200,36 +199,7 @@ function lineStyle(index: number) {
 <style scoped>
 .workflow-step {
   transition:
-    opacity 320ms ease,
-    transform 320ms ease,
-    border-color 320ms ease,
-    background-color 320ms ease,
-    color 320ms ease,
-    box-shadow 320ms ease;
-}
-
-.workflow-step--active {
-  box-shadow: inset 0 0 0 1px rgb(108 169 255 / 0.12), 0 0 24px rgb(108 169 255 / 0.06);
-}
-
-.workflow-step__dot {
-  box-shadow: 0 0 0 0 rgb(108 169 255 / 0.4);
-}
-
-.workflow-step__dot--active {
-  animation: workflow-dot-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes workflow-dot-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgb(108 169 255 / 0.14);
-  }
-
-  50% {
-    transform: scale(1.4);
-    box-shadow: 0 0 0 6px rgb(108 169 255 / 0);
-  }
+    color 280ms ease,
+    opacity 280ms ease;
 }
 </style>

@@ -2,7 +2,20 @@ import { createError, type H3Event } from 'h3'
 
 type CloudflareEnv = Record<string, unknown>
 
-export function readSecret(event: H3Event, value: string | undefined, preferredName: string, legacyNames: string[] = []) {
+type ReadSecretOptions = {
+  devDefault?: string
+  logOnDevDefault?: string
+}
+
+const loggedDevDefaults = new Set<string>()
+
+export function readSecret(
+  event: H3Event,
+  value: string | undefined,
+  preferredName: string,
+  legacyNames: string[] = [],
+  options: ReadSecretOptions = {},
+) {
   if (typeof value === 'string' && value.length > 0) {
     return value
   }
@@ -13,6 +26,15 @@ export function readSecret(event: H3Event, value: string | undefined, preferredN
     if (typeof candidate === 'string' && candidate.length > 0) {
       return candidate
     }
+  }
+
+  if (import.meta.dev && options.devDefault) {
+    if (options.logOnDevDefault && !loggedDevDefaults.has(preferredName)) {
+      loggedDevDefaults.add(preferredName)
+      console.info(options.logOnDevDefault)
+    }
+
+    return options.devDefault
   }
 
   throw createError({

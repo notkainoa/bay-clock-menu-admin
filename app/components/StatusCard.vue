@@ -3,30 +3,31 @@ import type { StatusStage } from '../types/menu-admin'
 
 const props = defineProps<{
   stage: StatusStage
-  detail: string
   commit: string
   runUrl?: string | null
+  errorMessage?: string
+  failureDetail?: string
 }>()
 </script>
 
 <template>
   <div class="mx-auto w-full max-w-xl">
     <div class="space-y-4">
-      <div>
-        <p class="text-xs uppercase tracking-[0.15em] text-text-muted">Workflow</p>
-        <h1 class="mt-1 font-display text-2xl text-text-primary">{{ props.stage }}</h1>
-        <p class="mt-1 text-sm text-text-secondary">{{ props.detail }}</p>
+      <div
+        v-if="props.errorMessage"
+        class="rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
+      >
+        {{ props.errorMessage }}
+      </div>
+
+      <div
+        v-else-if="props.stage === 'Failed' && props.failureDetail"
+        class="rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
+      >
+        {{ props.failureDetail }}
       </div>
 
       <WorkflowStepLoop :stage="props.stage" />
-
-      <!-- Failed banner -->
-      <div
-        v-if="props.stage === 'Failed'"
-        class="rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
-      >
-        Workflow failed. Check GitHub Actions for details.
-      </div>
 
       <!-- Commit tracking -->
       <div class="rounded-sm border border-border bg-surface p-3 space-y-2">

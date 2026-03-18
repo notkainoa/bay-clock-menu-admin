@@ -7,7 +7,16 @@ export default defineEventHandler(async event => {
   const code = typeof body?.code === 'string' ? body.code.trim() : ''
   const trustBrowser = body?.trustBrowser === true
   const runtimeConfig = useRuntimeConfig(event)
-  const password = readSecret(event, runtimeConfig.menuUploadPassword, 'NUXT_MENU_UPLOAD_PASSWORD', ['MENU_UPLOAD_PASSWORD'])
+  const password = readSecret(
+    event,
+    runtimeConfig.menuUploadPassword,
+    'NUXT_MENU_UPLOAD_PASSWORD',
+    ['MENU_UPLOAD_PASSWORD'],
+    {
+      devDefault: 'test-code',
+      logOnDevDefault: "[auth] NUXT_MENU_UPLOAD_PASSWORD is unset; using dev default 'test-code'.",
+    },
+  )
 
   if (!(await secureEqual(code, password))) {
     throw createError({

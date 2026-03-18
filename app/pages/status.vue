@@ -67,9 +67,10 @@ async function uploadAnother() {
     <div class="flex flex-1 items-center py-12">
       <StatusCard
         :stage="status?.stage || 'Queued'"
-        :detail="statusError || status?.detail || 'Waiting for GitHub Actions to pick up the upload.'"
         :commit="commit"
         :run-url="status?.run?.url"
+        :error-message="statusError"
+        :failure-detail="status?.stage === 'Failed' ? status?.detail : ''"
       >
         <div class="flex gap-2">
           <button class="btn text-xs" type="button" @click="uploadAnother">
