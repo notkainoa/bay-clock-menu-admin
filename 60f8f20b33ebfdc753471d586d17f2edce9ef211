@@ -1,0 +1,25 @@
+app/components/StatusCard.vue
+  79967167820a00f1 21
+app/components/WorkflowStepLoop.vue
+  79967167820a00f1 1-235
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "60f8f20b33ebfdc753471d586d17f2edce9ef211",
+  "prompts": {
+    "79967167820a00f1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cfddc-151b-7943-a39e-b2353697b9e3",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 236,
+      "total_deletions": 29,
+      "accepted_lines": 236,
+      "overriden_lines": 0
+    }
+  }
+}
