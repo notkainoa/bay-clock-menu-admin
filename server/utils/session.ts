@@ -17,8 +17,7 @@ export interface SessionState {
 }
 
 export async function createSession(event: H3Event, trusted: boolean) {
-  const runtimeConfig = useRuntimeConfig(event)
-  const secret = readSecret(event, runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET', ['SESSION_SIGNING_SECRET'])
+  const secret = getSessionSecret(event)
   const maxAge = trusted ? TRUSTED_MAX_AGE : SESSION_MAX_AGE
   const secure = getRequestURL(event).protocol === 'https:'
   const payload: SessionPayload = {
@@ -72,8 +71,7 @@ export async function requireSession(event: H3Event) {
 }
 
 async function readSession(event: H3Event): Promise<SessionPayload | null> {
-  const runtimeConfig = useRuntimeConfig(event)
-  const secret = readSecret(event, runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET', ['SESSION_SIGNING_SECRET'])
+  const secret = getSessionSecret(event)
   const rawCookie = getCookie(event, COOKIE_NAME)
   if (!rawCookie) {
     return null
@@ -96,6 +94,15 @@ async function readSession(event: H3Event): Promise<SessionPayload | null> {
 
   return decoded
 }
+
+function getSessionSecret(event: H3Event) {
+  const runtimeConfig = useRuntimeConfig(event)
+  return readSecret(event, runtimeConfig.sessionSigningSecret, 'NUXT_SESSION_SIGNING_SECRET', ['SESSION_SIGNING_SECRET'], {
+    devDefault: 'dev-session-signing-secret',
+    logOnDevDefault: '[session] NUXT_SESSION_SIGNING_SECRET is unset; using a dev-only default.',
+  })
+}
+
 function encodePayload(payload: SessionPayload) {
   const json = JSON.stringify(payload)
   return base64UrlEncode(new TextEncoder().encode(json))

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { FolderOpen, ImageUp, LogOut, PanelsTopLeft, SlidersHorizontal, TriangleAlert, Upload, View } from 'lucide-vue-next'
+import { Check, FolderOpen, ImageUp, LoaderCircle, LogOut, PanelsTopLeft, SlidersHorizontal, TriangleAlert, Upload, View, X } from 'lucide-vue-next'
 
 const props = defineProps<{
-  name: 'upload' | 'folder' | 'logout' | 'split' | 'slider' | 'warning' | 'view'
+  name: 'upload' | 'folder' | 'logout' | 'split' | 'slider' | 'warning' | 'view' | 'spinner' | 'check' | 'close'
   class?: string
 }>()
 
@@ -14,6 +14,9 @@ const icons = {
   slider: SlidersHorizontal,
   warning: TriangleAlert,
   view: View,
+  spinner: LoaderCircle,
+  check: Check,
+  close: X,
 } as const
 
 const icon = computed(() => icons[props.name])

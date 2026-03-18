@@ -40,25 +40,31 @@ API:
 npm install
 ```
 
-2. Copy env values:
-
-```bash
-cp .env.example .env
-```
-
-3. Start Nuxt:
+2. Start Nuxt:
 
 ```bash
 npm run dev
 ```
+
+For local dev, no `.env` file is required:
+
+- `NUXT_MENU_UPLOAD_PASSWORD` defaults to `test-code`
+- `NUXT_SESSION_SIGNING_SECRET` defaults to a dev-only signing secret
+
+Set `NUXT_GITHUB_TOKEN` only if you want to exercise the real GitHub-backed upload and workflow path locally.
 
 ## Environment
 
 Private runtime config is sourced from these env vars:
 
 - `NUXT_MENU_UPLOAD_PASSWORD`
+  - Optional in `npm run dev`; defaults to `test-code` when unset
+  - Required for build, preview, and deploy environments
 - `NUXT_SESSION_SIGNING_SECRET`
+  - Optional in `npm run dev`; defaults to a dev-only signing secret when unset
+  - Required for build, preview, and deploy environments
 - `NUXT_GITHUB_TOKEN`
+  - Required for GitHub-backed workflow features
 - `NUXT_GITHUB_OWNER`
 - `NUXT_GITHUB_REPO`
 - `NUXT_GITHUB_DEFAULT_BRANCH`
