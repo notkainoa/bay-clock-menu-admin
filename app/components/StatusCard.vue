@@ -7,19 +7,6 @@ const props = defineProps<{
   commit: string
   runUrl?: string | null
 }>()
-
-const stages = ['Queued', 'Processing', 'Publishing', 'Finalizing', 'Done'] as const
-
-function stageState(stage: string) {
-  if (props.stage === 'Failed') return 'idle'
-
-  const activeIndex = stages.indexOf(props.stage as typeof stages[number])
-  const stageIndex = stages.indexOf(stage as typeof stages[number])
-
-  if (stageIndex < activeIndex) return 'done'
-  if (stageIndex === activeIndex) return 'active'
-  return 'idle'
-}
 </script>
 
 <template>
@@ -31,21 +18,7 @@ function stageState(stage: string) {
         <p class="mt-1 text-sm text-text-secondary">{{ props.detail }}</p>
       </div>
 
-      <!-- Stage progress -->
-      <div class="flex gap-1">
-        <div
-          v-for="item in stages"
-          :key="item"
-          :class="[
-            'flex-1 rounded-[1px] border px-2 py-2 text-center text-[10px] uppercase tracking-wider',
-            stageState(item) === 'active' ? 'border-accent/40 bg-accent text-[#0a0a0a]' :
-            stageState(item) === 'done' ? 'border-border bg-surface-raised text-text-primary' :
-            'border-border-subtle text-text-muted',
-          ]"
-        >
-          {{ item }}
-        </div>
-      </div>
+      <WorkflowStepLoop :stage="props.stage" />
 
       <!-- Failed banner -->
       <div
