@@ -1,0 +1,25 @@
+app/components/StatusCard.vue
+  79967167820a00f1 14,18,25,30-32,35,51
+app/pages/status.vue
+  79967167820a00f1 77,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "285fad504c2d1622efb50f42f91bd79de326fe55",
+  "prompts": {
+    "79967167820a00f1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cfddc-151b-7943-a39e-b2353697b9e3",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 14,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
