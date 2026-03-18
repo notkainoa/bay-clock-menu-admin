@@ -1,0 +1,52 @@
+server/api/auth.post.ts
+  79967167820a00f1 14-18
+app/pages/status.vue
+  def76be72be3f016 72-73
+README.md
+  79967167820a00f1 43,46,49,51-52,54,61-62,64-65,67
+.env.example
+  79967167820a00f1 1-2,4-5
+app/components/StatusCard.vue
+  def76be72be3f016 8-9,17-18,20,24,27,30
+app/components/WorkflowStepLoop.vue
+  def76be72be3f016 5,72-76,78-83,85-89,92-98,100-104,107,109-112,114,116-120,123-127,130-134,137-139,141,143-146,148-150,152-154,156-157,159-162,164-165,167-168,173-174,176,180,183-193,202-203
+server/utils/session.ts
+  def76be72be3f016 20,74,97-103,105
+app/components/Icon.vue
+  def76be72be3f016 2,5,17-19
+server/utils/secrets.ts
+  79967167820a00f1 5-11,16-17,31-34,36-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "411303105a37235c6116a8d828367dda4bd972a0",
+  "prompts": {
+    "79967167820a00f1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cfddc-151b-7943-a39e-b2353697b9e3",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 55,
+      "total_deletions": 14,
+      "accepted_lines": 39,
+      "overriden_lines": 0
+    },
+    "def76be72be3f016": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0193-f4ab-7202-b2b1-f26e395eb052",
+        "model": "unknown"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 123,
+      "total_deletions": 141,
+      "accepted_lines": 119,
+      "overriden_lines": 0
+    }
+  }
+}
