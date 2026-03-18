@@ -175,7 +175,7 @@ function iconClass() {
 
     <div class="space-y-2">
       <div
-      v-for="(step, index) in WORKFLOW_STEPS"
+        v-for="(step, index) in WORKFLOW_STEPS"
         :key="`${step.stage}-${index}`"
         class="workflow-step flex items-start gap-3 text-sm leading-5"
         :style="lineStyle(index)"

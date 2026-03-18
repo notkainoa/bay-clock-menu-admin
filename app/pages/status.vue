@@ -7,7 +7,6 @@ definePageMeta({
 
 const route = useRoute()
 const commit = computed(() => typeof route.query.commit === 'string' ? route.query.commit : '')
-const runtimeConfig = useRuntimeConfig()
 
 const status = ref<RunStatusPayload | null>(null)
 const statusError = ref('')
@@ -45,10 +44,6 @@ onBeforeUnmount(() => {
   }
 })
 
-const liveMenuUrl = computed(() =>
-  `https://raw.githubusercontent.com/${runtimeConfig.public.githubOwner}/${runtimeConfig.public.githubRepo}/${runtimeConfig.public.githubDefaultBranch}/public/menu/menu.jpg?t=${Date.now()}`,
-)
-
 async function uploadAnother() {
   await navigateTo('/upload')
 }
@@ -79,11 +74,11 @@ async function uploadAnother() {
           <a
             v-if="status?.stage === 'Done'"
             class="btn-primary text-xs"
-            :href="liveMenuUrl"
+            href="https://bayclock.org"
             target="_blank"
             rel="noreferrer"
           >
-            View live menu
+            View Bay Clock
           </a>
         </div>
       </StatusCard>

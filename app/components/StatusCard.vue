@@ -11,26 +11,28 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-xl">
+  <div class="mx-auto w-full max-w-[35rem]">
     <div class="space-y-4">
       <div
         v-if="props.errorMessage"
-        class="rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
+        class="mx-auto w-full max-w-[29rem] rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
       >
         {{ props.errorMessage }}
       </div>
 
       <div
         v-else-if="props.stage === 'Failed' && props.failureDetail"
-        class="rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
+        class="mx-auto w-full max-w-[29rem] rounded-sm border border-danger/30 bg-danger-muted px-3 py-2 text-xs text-danger"
       >
         {{ props.failureDetail }}
       </div>
 
-      <WorkflowStepLoop :stage="props.stage" />
+      <div class="mx-auto w-full max-w-[29rem]">
+        <WorkflowStepLoop :stage="props.stage" />
+      </div>
 
       <!-- Commit tracking -->
-      <div class="rounded-sm border border-border bg-surface p-3 space-y-2">
+      <div class="mx-auto w-full max-w-[29rem] rounded-sm border border-border bg-surface p-3 space-y-2">
         <p class="text-[10px] uppercase tracking-wider text-text-muted">Tracking commit</p>
         <code class="block overflow-hidden text-ellipsis whitespace-nowrap text-xs text-text-primary font-mono">{{ props.commit }}</code>
         <a
@@ -46,7 +48,7 @@ const props = defineProps<{
       </div>
 
       <!-- Actions slot -->
-      <div>
+      <div class="mx-auto w-full max-w-[29rem]">
         <slot />
       </div>
     </div>
