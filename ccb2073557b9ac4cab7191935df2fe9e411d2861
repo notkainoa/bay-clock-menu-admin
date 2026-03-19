@@ -1,0 +1,29 @@
+app/components/WorkflowStepLoop.vue
+  c3d7244013c9a08d 10,20,22,31-35,40,95,99-100,102,104-108,111,115-116,124-125,129,133,144-145,148-149,178,198-206,212
+app/components/StatusCard.vue
+  c3d7244013c9a08d 34-35
+tests/components/StatusCard.test.ts
+  c3d7244013c9a08d 1-64
+tests/components/WorkflowStepLoop.test.ts
+  c3d7244013c9a08d 23,27-28,41-42,45-46,50-59,102-103,107-108,112-113,133-134,159-160,165,168-169,172-181,183-206,210,213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "ccb2073557b9ac4cab7191935df2fe9e411d2861",
+  "prompts": {
+    "c3d7244013c9a08d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0310-f01c-7751-bc54-012f4fe92d26",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 183,
+      "total_deletions": 34,
+      "accepted_lines": 183,
+      "overriden_lines": 0
+    }
+  }
+}
