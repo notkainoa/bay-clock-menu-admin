@@ -41,6 +41,7 @@ const SOURCE_COMMIT_PREFIX = 'chore: update lunch menu image'
 const SOURCE_COMMIT_TAG_TEMPLATE = '(source '
 const PUBLISH_COMMIT_FALLBACK_WINDOW_MS = 5 * 60 * 1000
 const DEFAULT_COMMIT_LOOKBACK_COUNT = 20
+const PUBLISH_COMMIT_RESOLUTION_GRACE_MS = 2 * 60 * 1000
 
 interface GithubRefResponse {
   object: {
@@ -363,6 +364,10 @@ export function normalizeWorkflowStatus({
   const milestones = buildWorkflowMilestones(run, jobs, publishCommit, deploy)
   const failureDetail = getFailureDetail(jobs)
   const failedMilestone = milestones.find(milestone => milestone.status === 'failed') || null
+  const publishCommitExpected = didPublishStepSucceed(milestones)
+  const waitingForPublishCommitResolution = publishCommitExpected
+    && !publishCommit
+    && shouldKeepPollingForPublishCommit(run)
   const githubFailed = Boolean(
     failedMilestone
     || (run.status === 'completed' && run.conclusion && run.conclusion !== 'success'),
@@ -373,7 +378,7 @@ export function normalizeWorkflowStatus({
   const terminal = githubFailed
     || deployFailed
     || deploySucceeded
-    || (githubSucceeded && !publishCommit)
+    || (githubSucceeded && !publishCommit && !waitingForPublishCommitResolution)
 
   return {
     stage: resolveStage({
@@ -392,6 +397,7 @@ export function normalizeWorkflowStatus({
       deploy,
       failureDetail,
       failedMilestone,
+      waitingForPublishCommitResolution,
       githubFailed,
       deployFailed,
       deploySucceeded,
@@ -603,6 +609,7 @@ function resolveDetail({
   deploy,
   failureDetail,
   failedMilestone,
+  waitingForPublishCommitResolution,
   githubFailed,
   deployFailed,
   deploySucceeded,
@@ -612,6 +619,7 @@ function resolveDetail({
   deploy: DeployStatusInfo | null
   failureDetail: string
   failedMilestone: WorkflowMilestone | null
+  waitingForPublishCommitResolution: boolean
   githubFailed: boolean
   deployFailed: boolean
   deploySucceeded: boolean
@@ -640,6 +648,10 @@ function resolveDetail({
     return 'GitHub Actions has the upload and is waiting for a runner.'
   }
 
+  if (waitingForPublishCommitResolution) {
+    return 'GitHub publish completed. Waiting to resolve the publish commit for deploy tracking.'
+  }
+
   if (publishCommit && !deploy) {
     return 'GitHub publish completed. Waiting for Vercel to create a deployment status.'
   }
@@ -653,6 +665,23 @@ function resolveDetail({
   }
 
   return 'GitHub Actions is processing the upload.'
+}
+
+function didPublishStepSucceed(milestones: WorkflowMilestone[]) {
+  return milestones.some(milestone => milestone.id === 'publish-assets' && milestone.status === 'completed')
+}
+
+function shouldKeepPollingForPublishCommit(run: Pick<WorkflowRun, 'updated_at'>) {
+  if (!run.updated_at) {
+    return false
+  }
+
+  const updatedAt = Date.parse(run.updated_at)
+  if (!Number.isFinite(updatedAt)) {
+    return false
+  }
+
+  return Date.now() - updatedAt < PUBLISH_COMMIT_RESOLUTION_GRACE_MS
 }
 
 export function resolvePublishCommit(

@@ -71,6 +71,10 @@ describe('createMissingRunStatus', () => {
 })
 
 describe('normalizeWorkflowStatus', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('does not let pending later milestones advance the stage ahead of the active step', () => {
     const result = normalizeWorkflowStatus({
       run: makeRun(),
@@ -233,6 +237,28 @@ describe('normalizeWorkflowStatus', () => {
     expect(result.milestones.find(milestone => milestone.id === 'deployment-live')).toBeUndefined()
   })
 
+  it('keeps polling briefly when publish succeeded but the publish commit has not resolved yet', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-18T22:10:50Z'))
+
+    const result = normalizeWorkflowStatus({
+      run: makeRun({
+        status: 'completed',
+        conclusion: 'success',
+        updated_at: '2026-03-18T22:10:20Z',
+      }),
+      jobsPayload: makeJobsPayload([
+        trackedStep('Publish processed assets to main', 'completed', 'success'),
+      ]),
+      publishCommit: null,
+      deploy: null,
+    })
+
+    expect(result.terminal).toBe(false)
+    expect(result.stage).toBe('Publishing')
+    expect(result.detail).toBe('GitHub publish completed. Waiting to resolve the publish commit for deploy tracking.')
+  })
+
   it('keeps Vercel deploy in progress while the deployment is pending', () => {
     const result = normalizeWorkflowStatus({
       run: makeRun({
@@ -317,10 +343,14 @@ describe('normalizeWorkflowStatus', () => {
   })
 
   it('omits deploy milestones when no publish commit can be found', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-18T22:15:00Z'))
+
     const result = normalizeWorkflowStatus({
       run: makeRun({
         status: 'completed',
         conclusion: 'success',
+        updated_at: '2026-03-18T22:10:20Z',
       }),
       jobsPayload: makeJobsPayload([
         trackedStep('Process upload into live menu assets', 'completed', 'success'),
