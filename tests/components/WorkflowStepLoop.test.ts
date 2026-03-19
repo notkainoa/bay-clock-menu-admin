@@ -20,11 +20,12 @@ function milestone(
   }
 }
 
-function mountWorkflow(milestones: WorkflowMilestone[]) {
+function mountWorkflow(milestones: WorkflowMilestone[], options: { terminal?: boolean, detail?: string } = {}) {
   return mount(WorkflowStepLoop, {
     props: {
       milestones,
-      terminal: false,
+      terminal: options.terminal || false,
+      detail: options.detail || 'Waiting for GitHub Actions to pick up the upload commit.',
     },
     global: {
       stubs: {
@@ -37,11 +38,25 @@ function mountWorkflow(milestones: WorkflowMilestone[]) {
   })
 }
 
-function highlightedId(wrapper: ReturnType<typeof mountWorkflow>) {
-  return wrapper.find('[data-highlighted="true"]').attributes('data-milestone-id')
+function workingId(wrapper: ReturnType<typeof mountWorkflow>) {
+  return wrapper.find('[data-working="true"]').attributes('data-milestone-id')
+}
+
+function spinnerCount(wrapper: ReturnType<typeof mountWorkflow>) {
+  return wrapper.findAll('[data-icon-name="spinner"]').length
 }
 
 describe('WorkflowStepLoop', () => {
+  it('renders a spinner placeholder row when no milestones exist and the workflow is still active', () => {
+    const wrapper = mountWorkflow([], {
+      detail: 'Waiting for GitHub Actions to pick up the upload commit.',
+    })
+
+    expect(wrapper.find('[data-placeholder-row="true"]').exists()).toBe(true)
+    expect(spinnerCount(wrapper)).toBe(1)
+    expect(wrapper.text()).toContain('Waiting for GitHub Actions to pick up the upload commit.')
+  })
+
   it('renders only milestones present in the payload', () => {
     const wrapper = mountWorkflow([
       milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
@@ -84,15 +99,18 @@ describe('WorkflowStepLoop', () => {
     })
     await nextTick()
 
-    expect(highlightedId(wrapper)).toBe('process-upload')
+    expect(workingId(wrapper)).toBe('process-upload')
+    expect(spinnerCount(wrapper)).toBe(1)
 
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
-    expect(highlightedId(wrapper)).toBe('publish-assets')
+    expect(workingId(wrapper)).toBe('publish-assets')
+    expect(spinnerCount(wrapper)).toBe(1)
 
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
-    expect(highlightedId(wrapper)).toBe('clear-inbox')
+    expect(workingId(wrapper)).toBe('clear-inbox')
+    expect(spinnerCount(wrapper)).toBe(1)
 
     vi.useRealTimers()
   })
@@ -112,7 +130,8 @@ describe('WorkflowStepLoop', () => {
     await vi.advanceTimersByTimeAsync(500)
     await nextTick()
 
-    expect(highlightedId(wrapper)).toBe('publish-assets')
+    expect(workingId(wrapper)).toBe('publish-assets')
+    expect(spinnerCount(wrapper)).toBe(1)
 
     vi.useRealTimers()
   })
@@ -137,20 +156,60 @@ describe('WorkflowStepLoop', () => {
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
 
-    expect(highlightedId(wrapper)).toBe('publish-assets')
+    expect(workingId(wrapper)).toBe('publish-assets')
+    expect(spinnerCount(wrapper)).toBe(1)
 
     vi.useRealTimers()
   })
 
-  it('shows failed styling on the failed milestone', () => {
+  it('uses the pending vercel milestone as the active loading row when nothing is in progress', () => {
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+      milestone('publish-assets', 'completed', '2026-03-18T22:10:20Z'),
+      milestone('vercel-deploy', 'pending'),
+    ])
+
+    expect(workingId(wrapper)).toBe('vercel-deploy')
+    expect(spinnerCount(wrapper)).toBe(1)
+  })
+
+  it('shows exactly one spinner for non-terminal workflow states', () => {
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+      milestone('process-upload', 'completed', '2026-03-18T22:10:18Z'),
+      milestone('publish-assets', 'pending'),
+      milestone('clear-inbox', 'pending'),
+    ])
+
+    expect(spinnerCount(wrapper)).toBe(1)
+  })
+
+  it('renders no spinner after terminal success and keeps completed check icons', () => {
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+      milestone('publish-assets', 'completed', '2026-03-18T22:10:20Z'),
+      milestone('deployment-live', 'completed', '2026-03-18T22:11:20Z'),
+    ], {
+      terminal: true,
+    })
+
+    expect(spinnerCount(wrapper)).toBe(0)
+    expect(wrapper.findAll('[data-icon-name="check"]')).toHaveLength(3)
+  })
+
+  it('shows failed styling on the failed milestone for terminal failures', () => {
     const wrapper = mountWorkflow([
       milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
       milestone('publish-assets', 'failed', '2026-03-18T22:10:20Z'),
-    ])
+    ], {
+      terminal: true,
+    })
 
     const failedRow = wrapper.find('[data-milestone-id="publish-assets"]')
     expect(failedRow.attributes('data-milestone-status')).toBe('failed')
+    expect(failedRow.attributes('data-working')).toBe('true')
     expect(failedRow.classes()).toContain('text-danger')
     expect(failedRow.find('[data-icon-name="close"]').exists()).toBe(true)
+    expect(spinnerCount(wrapper)).toBe(0)
   })
 })

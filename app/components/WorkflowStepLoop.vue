@@ -7,6 +7,7 @@ const REPLAY_DURATION_MS = 200
 const props = defineProps<{
   milestones: WorkflowMilestone[]
   terminal: boolean
+  detail: string
 }>()
 
 const title = 'Workflow'
@@ -16,9 +17,9 @@ const replayQueue = ref<WorkflowMilestone['id'][]>([])
 const replayMilestoneId = ref<WorkflowMilestone['id'] | null>(null)
 let replayTimer: ReturnType<typeof setTimeout> | null = null
 
-const settledActiveMilestoneId = computed<WorkflowMilestone['id'] | null>(() => {
+const fallbackWorkingMilestoneId = computed<WorkflowMilestone['id'] | null>(() => {
   const failedMilestone = props.milestones.find(milestone => milestone.status === 'failed')
-  if (failedMilestone) {
+  if (props.terminal && failedMilestone) {
     return failedMilestone.id
   }
 
@@ -27,11 +28,16 @@ const settledActiveMilestoneId = computed<WorkflowMilestone['id'] | null>(() => 
     return inProgressMilestone.id
   }
 
+  const pendingMilestone = props.milestones.find(milestone => milestone.status === 'pending')
+  if (pendingMilestone) {
+    return pendingMilestone.id
+  }
+
   const completedMilestones = props.milestones.filter(milestone => milestone.status === 'completed')
   return completedMilestones.at(-1)?.id || null
 })
 
-const highlightedMilestoneId = computed(() => replayMilestoneId.value || settledActiveMilestoneId.value)
+const workingMilestoneId = computed<WorkflowMilestone['id'] | null>(() => replayMilestoneId.value || fallbackWorkingMilestoneId.value)
 
 watch(() => props.milestones, (milestones) => {
   const previousStates = { ...lastSeenMilestoneState.value }
@@ -86,20 +92,28 @@ function clearReplayTimer() {
 }
 
 function runReplayQueue() {
-  if (replayTimer || !replayQueue.value.length) {
+  if (replayTimer || replayMilestoneId.value || !replayQueue.value.length) {
     return
   }
 
+  advanceReplayQueue()
+}
+
+function advanceReplayQueue() {
   replayMilestoneId.value = replayQueue.value.shift() || null
+  if (!replayMilestoneId.value) {
+    replayTimer = null
+    return
+  }
+
   replayTimer = setTimeout(() => {
     replayTimer = null
-    replayMilestoneId.value = null
-    runReplayQueue()
+    advanceReplayQueue()
   }, REPLAY_DURATION_MS)
 }
 
-function isHighlighted(milestoneId: WorkflowMilestone['id']) {
-  return highlightedMilestoneId.value === milestoneId
+function isWorkingRow(milestoneId: WorkflowMilestone['id']) {
+  return workingMilestoneId.value === milestoneId
 }
 
 function lineClass(milestone: WorkflowMilestone) {
@@ -107,14 +121,16 @@ function lineClass(milestone: WorkflowMilestone) {
     return 'text-danger opacity-100'
   }
 
+  if (isWorkingRow(milestone.id) && !props.terminal) {
+    return 'text-text-primary opacity-100'
+  }
+
   if (milestone.status === 'completed') {
-    return isHighlighted(milestone.id)
-      ? 'text-text-primary opacity-100'
-      : 'text-text-secondary opacity-90'
+    return 'text-text-secondary opacity-90'
   }
 
   if (milestone.status === 'in_progress') {
-    return 'text-text-primary opacity-100'
+    return 'text-text-secondary opacity-90'
   }
 
   return 'text-text-muted opacity-55'
@@ -125,12 +141,12 @@ function iconName(milestone: WorkflowMilestone) {
     return 'close'
   }
 
-  if (milestone.status === 'completed') {
-    return 'check'
+  if (!props.terminal && isWorkingRow(milestone.id)) {
+    return 'spinner'
   }
 
-  if (milestone.status === 'in_progress') {
-    return 'spinner'
+  if (milestone.status === 'completed') {
+    return 'check'
   }
 
   return null
@@ -159,7 +175,7 @@ function iconClass(milestone: WorkflowMilestone) {
         :key="milestone.id"
         :data-milestone-id="milestone.id"
         :data-milestone-status="milestone.status"
-        :data-highlighted="isHighlighted(milestone.id) ? 'true' : 'false'"
+        :data-working="isWorkingRow(milestone.id) ? 'true' : 'false'"
         class="workflow-step flex items-start gap-3 text-sm leading-5"
         :class="lineClass(milestone)"
       >
@@ -179,8 +195,21 @@ function iconClass(milestone: WorkflowMilestone) {
       </div>
     </div>
 
+    <div v-else-if="!props.terminal" class="space-y-2">
+      <div class="workflow-step flex items-start gap-3 text-sm leading-5 text-text-primary opacity-100" data-placeholder-row="true">
+        <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
+          <Icon name="spinner" class="size-4 animate-spin text-text-secondary" />
+        </span>
+
+        <div class="min-w-0 space-y-0.5">
+          <p class="font-medium">Waiting for workflow</p>
+          <p class="text-xs text-current opacity-80">{{ props.detail }}</p>
+        </div>
+      </div>
+    </div>
+
     <p v-else class="text-sm text-text-muted">
-      Waiting for the first workflow milestone.
+      Workflow complete.
     </p>
   </div>
 </template>

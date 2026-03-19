@@ -31,11 +31,8 @@ const props = defineProps<{
         {{ props.failureDetail }}
       </div>
 
-      <div class="mx-auto w-full max-w-[29rem] space-y-3">
-        <WorkflowStepLoop :milestones="props.milestones" :terminal="props.terminal" />
-        <p class="text-sm text-text-secondary">
-          {{ props.detail }}
-        </p>
+      <div class="mx-auto w-full max-w-[29rem]">
+        <WorkflowStepLoop :milestones="props.milestones" :terminal="props.terminal" :detail="props.detail" />
       </div>
 
       <!-- Commit tracking -->
