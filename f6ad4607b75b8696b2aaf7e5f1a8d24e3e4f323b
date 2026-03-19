@@ -1,0 +1,52 @@
+app/pages/status.vue
+  c3d7244013c9a08d 66-68,70,79
+server/utils/github.ts
+  c3d7244013c9a08d 2-9,14,16,18-19,23,25-26,30,32-33,38-44,68-70,81-82,95-108,110-111,115-120,123-146,173,177-193,195-210,331-336,338-340,343-344,347-350,353-376,379-398,400-402,415-422,426-429,431-585,587-593,600-748,766,771
+app/components/StatusCard.vue
+  c3d7244013c9a08d 2,7-9,11,34-38,45-46,54-66
+package.json
+  c3d7244013c9a08d 12,28-29,31-32
+vitest.config.ts
+  c3d7244013c9a08d 1-17
+tests/components/WorkflowStepLoop.test.ts
+  5b4c5763aaad26ae 1-156
+app/components/WorkflowStepLoop.vue
+  c3d7244013c9a08d 2-3,5,8-9,12-31,34,36-38,40-45,47-51,54-60,62-64,66-67,70-72,75-77,79-81,84-86,88-90,93-98,101-102,105-107,110-113,116-117,120-121,123-124,128,132-133,136,139-140,144,156,158-162,164,168-170,172,175-178,181-184,191-192
+app/types/menu-admin.ts
+  c3d7244013c9a08d 4-5,20-50,63-65
+tests/server/github.test.ts
+  5b4c5763aaad26ae 1-382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "f6ad4607b75b8696b2aaf7e5f1a8d24e3e4f323b",
+  "prompts": {
+    "5b4c5763aaad26ae": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0416-341f-7f43-9ab3-5f569da87e02",
+        "model": "unknown"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 538,
+      "total_deletions": 0,
+      "accepted_lines": 538,
+      "overriden_lines": 0
+    },
+    "c3d7244013c9a08d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0310-f01c-7751-bc54-012f4fe92d26",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 727,
+      "total_deletions": 211,
+      "accepted_lines": 716,
+      "overriden_lines": 0
+    }
+  }
+}
