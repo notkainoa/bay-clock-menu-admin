@@ -1,167 +1,147 @@
 <script setup lang="ts">
-import type { StatusStage } from '../types/menu-admin'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import type { WorkflowMilestone } from '../types/menu-admin'
 
-type DisplayStage = Exclude<StatusStage, 'Failed'>
-type StepTone = 'current' | 'near' | 'mid' | 'far' | 'fade'
+const REPLAY_DURATION_MS = 200
 
 const props = defineProps<{
-  stage: StatusStage
+  milestones: WorkflowMilestone[]
+  terminal: boolean
 }>()
 
-const WORKFLOW_STEPS = [
-  {
-    stage: 'Queued',
-    label: 'Receiving the upload commit and matching it to a workflow run.',
-  },
-  {
-    stage: 'Queued',
-    label: 'Waiting for a GitHub runner to pick up the job.',
-  },
-  {
-    stage: 'Processing',
-    label: 'Downloading the source menu from the inbox branch.',
-  },
-  {
-    stage: 'Processing',
-    label: 'Converting the upload into live menu assets.',
-  },
-  {
-    stage: 'Processing',
-    label: 'Checking the generated files before publish.',
-  },
-  {
-    stage: 'Publishing',
-    label: 'Committing processed assets to the live branch.',
-  },
-  {
-    stage: 'Publishing',
-    label: 'Refreshing the public menu files served by the site.',
-  },
-  {
-    stage: 'Finalizing',
-    label: 'Clearing the processed inbox item and wrapping up the run.',
-  },
-  {
-    stage: 'Done',
-    label: 'Menu assets published successfully and ready to view.',
-  },
-] as const
-
-const STEP_INDICES_BY_STAGE = WORKFLOW_STEPS.reduce((accumulator, step, index) => {
-  accumulator[step.stage].push(index)
-  return accumulator
-}, {
-  Queued: [] as number[],
-  Processing: [] as number[],
-  Publishing: [] as number[],
-  Finalizing: [] as number[],
-  Done: [] as number[],
-})
-
-function firstIndexFor(stage: DisplayStage) {
-  return STEP_INDICES_BY_STAGE[stage][0] ?? 0
-}
-
-function lastIndexFor(stage: DisplayStage) {
-  const indices = STEP_INDICES_BY_STAGE[stage]
-  return indices[indices.length - 1] ?? 0
-}
-
-const lastStableStage = ref<DisplayStage>(props.stage === 'Failed' ? 'Queued' : props.stage)
-
-watch(() => props.stage, (stage) => {
-  if (stage !== 'Failed') {
-    lastStableStage.value = stage
-  }
-})
-
-const activeStage = computed<DisplayStage>(() => props.stage === 'Failed' ? lastStableStage.value : props.stage)
-const activeStepIndex = computed(() => props.stage === 'Done' ? lastIndexFor('Done') : firstIndexFor(activeStage.value))
 const title = 'Workflow'
+const hasSeenInitialPayload = ref(false)
+const lastSeenMilestoneState = ref<Record<WorkflowMilestone['id'], WorkflowMilestone['status']>>({} as Record<WorkflowMilestone['id'], WorkflowMilestone['status']>)
+const replayQueue = ref<WorkflowMilestone['id'][]>([])
+const replayMilestoneId = ref<WorkflowMilestone['id'] | null>(null)
+let replayTimer: ReturnType<typeof setTimeout> | null = null
 
-function stepTone(index: number): StepTone {
-  const distance = Math.abs(index - activeStepIndex.value)
+const settledActiveMilestoneId = computed<WorkflowMilestone['id'] | null>(() => {
+  const failedMilestone = props.milestones.find(milestone => milestone.status === 'failed')
+  if (failedMilestone) {
+    return failedMilestone.id
+  }
 
-  if (distance === 0) return 'current'
-  if (distance === 1) return 'near'
-  if (distance === 2) return 'mid'
-  if (distance === 3) return 'far'
-  return 'fade'
+  const inProgressMilestone = props.milestones.find(milestone => milestone.status === 'in_progress')
+  if (inProgressMilestone) {
+    return inProgressMilestone.id
+  }
+
+  const completedMilestones = props.milestones.filter(milestone => milestone.status === 'completed')
+  return completedMilestones.at(-1)?.id || null
+})
+
+const highlightedMilestoneId = computed(() => replayMilestoneId.value || settledActiveMilestoneId.value)
+
+watch(() => props.milestones, (milestones) => {
+  const previousStates = { ...lastSeenMilestoneState.value }
+  const nextStates = {} as Record<WorkflowMilestone['id'], WorkflowMilestone['status']>
+
+  const newlyCompletedMilestones = milestones
+    .filter((milestone) => {
+      nextStates[milestone.id] = milestone.status
+      return milestone.status === 'completed' && previousStates[milestone.id] !== 'completed'
+    })
+    .sort(compareMilestonesByCompletion)
+
+  lastSeenMilestoneState.value = nextStates
+
+  if (!hasSeenInitialPayload.value) {
+    hasSeenInitialPayload.value = true
+    return
+  }
+
+  if (!newlyCompletedMilestones.length) {
+    return
+  }
+
+  replayQueue.value.push(...newlyCompletedMilestones.map(milestone => milestone.id))
+  runReplayQueue()
+}, { deep: true, immediate: true })
+
+onBeforeUnmount(() => {
+  clearReplayTimer()
+})
+
+function compareMilestonesByCompletion(a: WorkflowMilestone, b: WorkflowMilestone) {
+  return milestoneTimeValue(a.completedAt) - milestoneTimeValue(b.completedAt)
 }
 
-function lineStyle(index: number) {
-  if (props.stage === 'Failed' && index === activeStepIndex.value) {
-    return {
-      color: '#ef4444',
-      opacity: 1,
-    }
+function milestoneTimeValue(value: string | null) {
+  if (!value) {
+    return Number.MAX_SAFE_INTEGER
   }
 
-  if (props.stage === 'Done' && index === activeStepIndex.value) {
-    return {
-      color: '#f5f5f5',
-      opacity: 1,
-    }
-  }
-
-  const tone = stepTone(index)
-
-  if (tone === 'current') {
-    return {
-      color: '#f5f5f5',
-      opacity: 1,
-    }
-  }
-
-  if (tone === 'near') {
-    return {
-      color: '#a3a3a3',
-      opacity: 0.95,
-    }
-  }
-
-  if (tone === 'mid') {
-    return {
-      color: '#737373',
-      opacity: 0.82,
-    }
-  }
-
-  if (tone === 'far') {
-    return {
-      color: '#525252',
-      opacity: 0.68,
-    }
-  }
-
-  return {
-    color: '#404040',
-    opacity: 0.34,
-  }
+  const parsed = Date.parse(value)
+  return Number.isFinite(parsed) ? parsed : Number.MAX_SAFE_INTEGER
 }
 
-function iconName(index: number) {
-  if (index !== activeStepIndex.value) {
-    return null
+function clearReplayTimer() {
+  if (!replayTimer) {
+    return
   }
 
-  if (props.stage === 'Failed') {
+  clearTimeout(replayTimer)
+  replayTimer = null
+}
+
+function runReplayQueue() {
+  if (replayTimer || !replayQueue.value.length) {
+    return
+  }
+
+  replayMilestoneId.value = replayQueue.value.shift() || null
+  replayTimer = setTimeout(() => {
+    replayTimer = null
+    replayMilestoneId.value = null
+    runReplayQueue()
+  }, REPLAY_DURATION_MS)
+}
+
+function isHighlighted(milestoneId: WorkflowMilestone['id']) {
+  return highlightedMilestoneId.value === milestoneId
+}
+
+function lineClass(milestone: WorkflowMilestone) {
+  if (milestone.status === 'failed') {
+    return 'text-danger opacity-100'
+  }
+
+  if (milestone.status === 'completed') {
+    return isHighlighted(milestone.id)
+      ? 'text-text-primary opacity-100'
+      : 'text-text-secondary opacity-90'
+  }
+
+  if (milestone.status === 'in_progress') {
+    return 'text-text-primary opacity-100'
+  }
+
+  return 'text-text-muted opacity-55'
+}
+
+function iconName(milestone: WorkflowMilestone) {
+  if (milestone.status === 'failed') {
     return 'close'
   }
 
-  if (props.stage === 'Done') {
+  if (milestone.status === 'completed') {
     return 'check'
   }
 
-  return 'spinner'
+  if (milestone.status === 'in_progress') {
+    return 'spinner'
+  }
+
+  return null
 }
 
-function iconClass() {
-  if (props.stage === 'Failed') {
+function iconClass(milestone: WorkflowMilestone) {
+  if (milestone.status === 'failed') {
     return 'size-4 text-danger'
   }
 
-  if (props.stage === 'Done') {
+  if (milestone.status === 'completed') {
     return 'size-4 text-success'
   }
 
@@ -173,33 +153,42 @@ function iconClass() {
   <div class="space-y-3">
     <p class="text-xs uppercase tracking-[0.15em] text-text-muted">{{ title }}</p>
 
-    <div class="space-y-2">
+    <div v-if="props.milestones.length" class="space-y-2">
       <div
-        v-for="(step, index) in WORKFLOW_STEPS"
-        :key="`${step.stage}-${index}`"
+        v-for="milestone in props.milestones"
+        :key="milestone.id"
+        :data-milestone-id="milestone.id"
+        :data-milestone-status="milestone.status"
+        :data-highlighted="isHighlighted(milestone.id) ? 'true' : 'false'"
         class="workflow-step flex items-start gap-3 text-sm leading-5"
-        :style="lineStyle(index)"
+        :class="lineClass(milestone)"
       >
         <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
           <Icon
-            v-if="iconName(index)"
-            :name="iconName(index)!"
-            :class="iconClass()"
+            v-if="iconName(milestone)"
+            :name="iconName(milestone)!"
+            :class="iconClass(milestone)"
           />
+          <span v-else class="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
         </span>
 
-        <p class="min-w-0">
-          {{ step.label }}
-        </p>
+        <div class="min-w-0 space-y-0.5">
+          <p class="font-medium">{{ milestone.label }}</p>
+          <p class="text-xs text-current opacity-80">{{ milestone.detail }}</p>
+        </div>
       </div>
     </div>
+
+    <p v-else class="text-sm text-text-muted">
+      Waiting for the first workflow milestone.
+    </p>
   </div>
 </template>
 
 <style scoped>
 .workflow-step {
   transition:
-    color 280ms ease,
-    opacity 280ms ease;
+    color 180ms ease,
+    opacity 180ms ease;
 }
 </style>
