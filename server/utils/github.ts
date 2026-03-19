@@ -364,7 +364,7 @@ export function normalizeWorkflowStatus({
   const milestones = buildWorkflowMilestones(run, jobs, publishCommit, deploy)
   const failureDetail = getFailureDetail(jobs)
   const failedMilestone = milestones.find(milestone => milestone.status === 'failed') || null
-  const publishCommitExpected = didPublishStepSucceed(milestones)
+  const publishCommitExpected = didTrackedWorkflowStepSucceed(jobs, 'publish-assets')
   const waitingForPublishCommitResolution = publishCommitExpected
     && !publishCommit
     && shouldKeepPollingForPublishCommit(run)
@@ -667,8 +667,9 @@ function resolveDetail({
   return 'GitHub Actions is processing the upload.'
 }
 
-function didPublishStepSucceed(milestones: WorkflowMilestone[]) {
-  return milestones.some(milestone => milestone.id === 'publish-assets' && milestone.status === 'completed')
+function didTrackedWorkflowStepSucceed(jobs: WorkflowJob[], stepId: WorkflowStepId) {
+  const trackedStep = indexTrackedWorkflowSteps(jobs)[stepId]
+  return trackedStep?.status === 'completed' && trackedStep.conclusion === 'success'
 }
 
 function shouldKeepPollingForPublishCommit(run: Pick<WorkflowRun, 'updated_at'>) {

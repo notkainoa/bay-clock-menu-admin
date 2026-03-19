@@ -259,6 +259,27 @@ describe('normalizeWorkflowStatus', () => {
     expect(result.detail).toBe('GitHub publish completed. Waiting to resolve the publish commit for deploy tracking.')
   })
 
+  it('does not keep polling for a skipped publish step', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-18T22:10:50Z'))
+
+    const result = normalizeWorkflowStatus({
+      run: makeRun({
+        status: 'completed',
+        conclusion: 'success',
+        updated_at: '2026-03-18T22:10:20Z',
+      }),
+      jobsPayload: makeJobsPayload([
+        trackedStep('Publish processed assets to main', 'completed', 'skipped'),
+      ]),
+      publishCommit: null,
+      deploy: null,
+    })
+
+    expect(result.terminal).toBe(true)
+    expect(result.detail).toBe('GitHub Actions completed successfully.')
+  })
+
   it('keeps Vercel deploy in progress while the deployment is pending', () => {
     const result = normalizeWorkflowStatus({
       run: makeRun({
