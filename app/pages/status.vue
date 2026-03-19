@@ -63,7 +63,11 @@ async function uploadAnother() {
       <StatusCard
         :stage="status?.stage || 'Queued'"
         :commit="commit"
+        :detail="status?.detail || 'Waiting for the latest workflow status.'"
+        :terminal="status?.terminal || false"
+        :milestones="status?.milestones || []"
         :run-url="status?.run?.url"
+        :deploy="status?.deploy"
         :error-message="statusError"
         :failure-detail="status?.stage === 'Failed' ? status?.detail : ''"
       >
@@ -72,7 +76,7 @@ async function uploadAnother() {
             Upload another
           </button>
           <a
-            v-if="status?.stage === 'Done'"
+            v-if="status?.terminal && status?.stage === 'Done'"
             class="btn-primary text-xs"
             href="https://bayclock.org"
             target="_blank"

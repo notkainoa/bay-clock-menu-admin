@@ -9,6 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "test": "vitest run",
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
@@ -24,7 +25,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
     "@vue/language-core": "^3.2.5",
+    "happy-dom": "^20.0.10",
+    "vitest": "^4.0.0",
     "vue-tsc": "^3.2.5"
   }
 }
