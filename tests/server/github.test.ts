@@ -71,6 +71,34 @@ describe('createMissingRunStatus', () => {
 })
 
 describe('normalizeWorkflowStatus', () => {
+  it('does not let pending later milestones advance the stage ahead of the active step', () => {
+    const result = normalizeWorkflowStatus({
+      run: makeRun(),
+      jobsPayload: makeJobsPayload([
+        trackedStep(
+          'Process upload into live menu assets',
+          'in_progress',
+          null,
+          '2026-03-18T22:10:06Z',
+        ),
+        trackedStep(
+          'Publish processed assets to main',
+          'queued',
+          null,
+        ),
+        trackedStep(
+          'Clear processed inbox item',
+          'queued',
+          null,
+        ),
+      ]),
+      publishCommit: null,
+      deploy: null,
+    })
+
+    expect(result.stage).toBe('Processing')
+  })
+
   it('shows the runner waiting milestone while the run is queued', () => {
     const result = normalizeWorkflowStatus({
       run: makeRun({
@@ -200,7 +228,7 @@ describe('normalizeWorkflowStatus', () => {
     })
 
     expect(result.terminal).toBe(false)
-    expect(result.stage).toBe('Finalizing')
+    expect(result.stage).toBe('Publishing')
     expect(result.milestones.find(milestone => milestone.id === 'vercel-deploy')?.status).toBe('pending')
     expect(result.milestones.find(milestone => milestone.id === 'deployment-live')).toBeUndefined()
   })
@@ -283,6 +311,7 @@ describe('normalizeWorkflowStatus', () => {
 
     expect(result.stage).toBe('Failed')
     expect(result.terminal).toBe(true)
+    expect(result.detail).toBe('Deployment errored')
     expect(result.milestones.find(milestone => milestone.id === 'vercel-deploy')?.status).toBe('failed')
     expect(result.milestones.find(milestone => milestone.id === 'deployment-live')).toBeUndefined()
   })

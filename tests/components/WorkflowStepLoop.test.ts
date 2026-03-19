@@ -3,6 +3,10 @@ import { nextTick } from 'vue'
 import WorkflowStepLoop from '../../app/components/WorkflowStepLoop.vue'
 import type { WorkflowMilestone } from '../../app/types/menu-admin'
 
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 function milestone(
   id: WorkflowMilestone['id'],
   status: WorkflowMilestone['status'],

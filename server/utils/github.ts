@@ -577,7 +577,7 @@ function resolveStage({
 
   for (let index = milestones.length - 1; index >= 0; index -= 1) {
     const milestone = milestones[index]!
-    if (!['completed', 'in_progress', 'pending'].includes(milestone.status)) {
+    if (!['completed', 'in_progress'].includes(milestone.status)) {
       continue
     }
 
@@ -617,6 +617,10 @@ function resolveDetail({
   deploySucceeded: boolean
 }) {
   if (failedMilestone) {
+    if (failedMilestone.source === 'vercel') {
+      return deploy?.description || 'Vercel deployment failed.'
+    }
+
     return `GitHub Actions failed during '${failedMilestone.label}'.`
   }
 
