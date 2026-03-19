@@ -1,0 +1,25 @@
+tests/server/github.test.ts
+  c3d7244013c9a08d 262-282
+server/utils/github.ts
+  c3d7244013c9a08d 367,670-672
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "f5ae71ad4e2a4bbd6a2b9445b2e2f7f2d98ef7c4",
+  "prompts": {
+    "c3d7244013c9a08d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0310-f01c-7751-bc54-012f4fe92d26",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 25,
+      "total_deletions": 3,
+      "accepted_lines": 25,
+      "overriden_lines": 0
+    }
+  }
+}
