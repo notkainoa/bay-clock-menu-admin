@@ -46,6 +46,10 @@ function spinnerCount(wrapper: ReturnType<typeof mountWorkflow>) {
   return wrapper.findAll('[data-icon-name="spinner"]').length
 }
 
+function row(wrapper: ReturnType<typeof mountWorkflow>, id: string) {
+  return wrapper.find(`[data-milestone-id="${id}"]`)
+}
+
 describe('WorkflowStepLoop', () => {
   it('renders a spinner placeholder row when no milestones exist and the workflow is still active', () => {
     const wrapper = mountWorkflow([], {
@@ -65,8 +69,8 @@ describe('WorkflowStepLoop', () => {
     ])
 
     expect(wrapper.findAll('[data-milestone-id]')).toHaveLength(3)
-    expect(wrapper.find('[data-milestone-id="run-matched"]').exists()).toBe(true)
-    expect(wrapper.find('[data-milestone-id="publish-assets"]').exists()).toBe(true)
+    expect(row(wrapper, 'run-matched').exists()).toBe(true)
+    expect(row(wrapper, 'publish-assets').exists()).toBe(true)
   })
 
   it('omits milestones that are not present in the payload', () => {
@@ -75,8 +79,95 @@ describe('WorkflowStepLoop', () => {
       milestone('process-upload', 'in_progress'),
     ])
 
-    expect(wrapper.find('[data-milestone-id="clear-inbox"]').exists()).toBe(false)
-    expect(wrapper.find('[data-milestone-id="vercel-deploy"]').exists()).toBe(false)
+    expect(row(wrapper, 'clear-inbox').exists()).toBe(false)
+    expect(row(wrapper, 'vercel-deploy').exists()).toBe(false)
+  })
+
+  it('does not mark existing milestones as entering on the initial payload', () => {
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+      milestone('process-upload', 'in_progress'),
+      milestone('publish-assets', 'pending'),
+    ])
+
+    expect(row(wrapper, 'run-matched').attributes('data-entering')).toBe('false')
+    expect(row(wrapper, 'process-upload').attributes('data-entering')).toBe('false')
+    expect(row(wrapper, 'publish-assets').attributes('data-entering')).toBe('false')
+  })
+
+  it('marks newly inserted milestones as entering after a later payload', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+    ])
+
+    await wrapper.setProps({
+      milestones: [
+        milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+        milestone('process-upload', 'in_progress'),
+        milestone('publish-assets', 'pending'),
+      ],
+    })
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('data-entering')).toBe('true')
+    expect(row(wrapper, 'publish-assets').attributes('data-entering')).toBe('true')
+
+    vi.useRealTimers()
+  })
+
+  it('clears inserted milestone entering state after the animation window', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+    ])
+
+    await wrapper.setProps({
+      milestones: [
+        milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+        milestone('process-upload', 'in_progress'),
+      ],
+    })
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('data-entering')).toBe('true')
+
+    await vi.advanceTimersByTimeAsync(160)
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('data-entering')).toBe('false')
+
+    vi.useRealTimers()
+  })
+
+  it('assigns enter delays in render order for multiple inserted milestones', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+    ])
+
+    await wrapper.setProps({
+      milestones: [
+        milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+        milestone('process-upload', 'in_progress'),
+        milestone('publish-assets', 'pending'),
+        milestone('clear-inbox', 'pending'),
+        milestone('vercel-deploy', 'pending'),
+        milestone('deployment-live', 'pending'),
+      ],
+    })
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('style')).toContain('--workflow-enter-delay: 0ms;')
+    expect(row(wrapper, 'publish-assets').attributes('style')).toContain('--workflow-enter-delay: 35ms;')
+    expect(row(wrapper, 'clear-inbox').attributes('style')).toContain('--workflow-enter-delay: 70ms;')
+    expect(row(wrapper, 'vercel-deploy').attributes('style')).toContain('--workflow-enter-delay: 105ms;')
+    expect(row(wrapper, 'deployment-live').attributes('style')).toContain('--workflow-enter-delay: 105ms;')
+
+    vi.useRealTimers()
   })
 
   it('replays newly completed milestones in completedAt order', async () => {
@@ -104,13 +195,46 @@ describe('WorkflowStepLoop', () => {
 
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
+
     expect(workingId(wrapper)).toBe('publish-assets')
     expect(spinnerCount(wrapper)).toBe(1)
 
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
+
     expect(workingId(wrapper)).toBe('clear-inbox')
     expect(spinnerCount(wrapper)).toBe(1)
+
+    vi.useRealTimers()
+  })
+
+  it('keeps a replayed completed milestone in working visual state for its full replay window', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = mountWorkflow([
+      milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+      milestone('process-upload', 'in_progress'),
+      milestone('publish-assets', 'pending'),
+    ])
+
+    await wrapper.setProps({
+      milestones: [
+        milestone('run-matched', 'completed', '2026-03-18T22:10:00Z'),
+        milestone('process-upload', 'completed', '2026-03-18T22:10:18Z'),
+        milestone('publish-assets', 'in_progress'),
+      ],
+    })
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('data-visual-state')).toBe('working')
+    expect(row(wrapper, 'process-upload').find('[data-icon-name="check"]').exists()).toBe(false)
+    expect(row(wrapper, 'process-upload').find('[data-icon-name="spinner"]').exists()).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(199)
+    await nextTick()
+
+    expect(row(wrapper, 'process-upload').attributes('data-visual-state')).toBe('working')
+    expect(row(wrapper, 'process-upload').find('[data-icon-name="spinner"]').exists()).toBe(true)
 
     vi.useRealTimers()
   })
@@ -153,9 +277,12 @@ describe('WorkflowStepLoop', () => {
       ],
     })
     await nextTick()
+
     await vi.advanceTimersByTimeAsync(200)
     await nextTick()
 
+    expect(row(wrapper, 'process-upload').attributes('data-visual-state')).toBe('completed')
+    expect(row(wrapper, 'process-upload').find('[data-icon-name="check"]').exists()).toBe(true)
     expect(workingId(wrapper)).toBe('publish-assets')
     expect(spinnerCount(wrapper)).toBe(1)
 
@@ -170,6 +297,7 @@ describe('WorkflowStepLoop', () => {
     ])
 
     expect(workingId(wrapper)).toBe('vercel-deploy')
+    expect(row(wrapper, 'vercel-deploy').attributes('data-visual-state')).toBe('working')
     expect(spinnerCount(wrapper)).toBe(1)
   })
 
@@ -194,6 +322,9 @@ describe('WorkflowStepLoop', () => {
     })
 
     expect(spinnerCount(wrapper)).toBe(0)
+    expect(row(wrapper, 'run-matched').attributes('data-visual-state')).toBe('completed')
+    expect(row(wrapper, 'publish-assets').attributes('data-visual-state')).toBe('completed')
+    expect(row(wrapper, 'deployment-live').attributes('data-visual-state')).toBe('completed')
     expect(wrapper.findAll('[data-icon-name="check"]')).toHaveLength(3)
   })
 
@@ -205,8 +336,9 @@ describe('WorkflowStepLoop', () => {
       terminal: true,
     })
 
-    const failedRow = wrapper.find('[data-milestone-id="publish-assets"]')
+    const failedRow = row(wrapper, 'publish-assets')
     expect(failedRow.attributes('data-milestone-status')).toBe('failed')
+    expect(failedRow.attributes('data-visual-state')).toBe('failed')
     expect(failedRow.attributes('data-working')).toBe('true')
     expect(failedRow.classes()).toContain('text-danger')
     expect(failedRow.find('[data-icon-name="close"]').exists()).toBe(true)
