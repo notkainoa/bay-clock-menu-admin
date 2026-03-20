@@ -15,7 +15,7 @@ function makeRun(overrides: Partial<TestRun> = {}): TestRun {
     head_sha: 'uploadsha',
     status: 'in_progress',
     conclusion: null,
-    html_url: 'https://github.com/notkainoa/bay-clock-3/actions/runs/42',
+    html_url: 'https://github.com/example-owner/example-repo/actions/runs/42',
     created_at: '2026-03-18T22:10:00Z',
     updated_at: '2026-03-18T22:10:20Z',
     run_started_at: '2026-03-18T22:10:05Z',
@@ -226,7 +226,7 @@ describe('normalizeWorkflowStatus', () => {
       ]),
       publishCommit: {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
       },
       deploy: null,
     })
@@ -291,13 +291,13 @@ describe('normalizeWorkflowStatus', () => {
       ]),
       publishCommit: {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
       },
       deploy: {
         provider: 'vercel',
         state: 'pending',
         description: 'Building deployment',
-        url: 'https://vercel.com/notkainoa/bay-clock-3/deployments/publish123',
+        url: 'https://vercel.com/example-owner/example-repo/deployments/publish123',
         updatedAt: '2026-03-18T22:11:00Z',
       },
     })
@@ -317,7 +317,7 @@ describe('normalizeWorkflowStatus', () => {
       ]),
       publishCommit: {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
       },
       deploy: {
         provider: 'vercel',
@@ -345,13 +345,13 @@ describe('normalizeWorkflowStatus', () => {
       ]),
       publishCommit: {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
       },
       deploy: {
         provider: 'vercel',
         state: 'failed',
         description: 'Deployment errored',
-        url: 'https://vercel.com/notkainoa/bay-clock-3/deployments/publish123',
+        url: 'https://vercel.com/example-owner/example-repo/deployments/publish123',
         updatedAt: '2026-03-18T22:12:00Z',
       },
     })
@@ -393,7 +393,7 @@ describe('resolvePublishCommit', () => {
     const publishCommit = resolvePublishCommit('uploadsha', makeRun(), [
       {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
         message: 'chore: update lunch menu image (source uploadsha)',
         authoredAt: '2026-03-18T22:10:21Z',
         authorLogin: 'github-actions[bot]',
@@ -403,7 +403,7 @@ describe('resolvePublishCommit', () => {
 
     expect(publishCommit).toEqual({
       sha: 'publish123',
-      url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+      url: 'https://github.com/example-owner/example-repo/commit/publish123',
     })
   })
 
@@ -411,7 +411,7 @@ describe('resolvePublishCommit', () => {
     const publishCommit = resolvePublishCommit('uploadsha', makeRun(), [
       {
         sha: 'publish123',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+        url: 'https://github.com/example-owner/example-repo/commit/publish123',
         message: 'chore: update lunch menu image',
         authoredAt: '2026-03-18T22:10:21Z',
         authorLogin: 'github-actions[bot]',
@@ -419,7 +419,7 @@ describe('resolvePublishCommit', () => {
       },
       {
         sha: 'other456',
-        url: 'https://github.com/notkainoa/bay-clock-3/commit/other456',
+        url: 'https://github.com/example-owner/example-repo/commit/other456',
         message: 'docs: update readme',
         authoredAt: '2026-03-18T22:09:00Z',
         authorLogin: 'octocat',
@@ -429,7 +429,7 @@ describe('resolvePublishCommit', () => {
 
     expect(publishCommit).toEqual({
       sha: 'publish123',
-      url: 'https://github.com/notkainoa/bay-clock-3/commit/publish123',
+      url: 'https://github.com/example-owner/example-repo/commit/publish123',
     })
   })
 })
@@ -441,21 +441,21 @@ describe('normalizeDeployStatus', () => {
         context: 'Tests',
         state: 'success',
         description: 'Passed',
-        target_url: 'https://github.com/notkainoa/bay-clock-3/actions',
+        target_url: 'https://github.com/example-owner/example-repo/actions',
         updated_at: '2026-03-18T22:12:00Z',
       },
       {
         context: 'Vercel',
         state: 'pending',
         description: 'Building deployment',
-        target_url: 'https://vercel.com/notkainoa/bay-clock-3/deployments/publish123',
+        target_url: 'https://vercel.com/example-owner/example-repo/deployments/publish123',
         updated_at: '2026-03-18T22:12:05Z',
       },
     ])).toEqual({
       provider: 'vercel',
       state: 'pending',
       description: 'Building deployment',
-      url: 'https://vercel.com/notkainoa/bay-clock-3/deployments/publish123',
+      url: 'https://vercel.com/example-owner/example-repo/deployments/publish123',
       updatedAt: '2026-03-18T22:12:05Z',
     })
   })
