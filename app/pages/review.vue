@@ -4,10 +4,12 @@ definePageMeta({
 })
 
 const menuAdmin = useMenuAdmin()
-const runtimeConfig = useRuntimeConfig()
+const { data: liveMenuPayload } = await useFetch<{ ok: true, url: string }>('/api/live-menu-url')
 
 const liveMenuUrl = computed(() =>
-  `https://raw.githubusercontent.com/${runtimeConfig.public.githubOwner}/${runtimeConfig.public.githubRepo}/${runtimeConfig.public.githubDefaultBranch}/public/menu/menu.jpg?t=${menuAdmin.reviewNonce.value}`,
+  liveMenuPayload.value?.url
+    ? `${liveMenuPayload.value.url}?t=${menuAdmin.reviewNonce.value}`
+    : '',
 )
 
 const previewMeta = computed(() => {

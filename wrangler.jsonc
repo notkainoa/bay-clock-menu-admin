@@ -8,10 +8,6 @@
     "binding": "ASSETS"
   },
   "vars": {
-    "NUXT_GITHUB_OWNER": "notkainoa",
-    "NUXT_GITHUB_REPO": "bay-clock-3",
-    "NUXT_GITHUB_DEFAULT_BRANCH": "main",
-    "NUXT_GITHUB_INBOX_BRANCH": "menu-upload-inbox",
     "NUXT_UPLOAD_MAX_BYTES": "15728640"
   }
 }
