@@ -1,0 +1,29 @@
+tests/server/github.test.ts
+  3763798fe389c910 18,229,294,300,320,348,354,396,406,414,422,432,444,451,458
+app/pages/review.vue
+  3763798fe389c910 7,10-12
+nuxt.config.ts
+  3763798fe389c910 16-19
+server/api/live-menu-url.get.ts
+  3763798fe389c910 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "3570216ee0c385f498f336fb5c1c25412ce29e06",
+  "prompts": {
+    "3763798fe389c910": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d0bcc-f158-7c53-8f8e-0b0cc4ef7dc4",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kainoa Newton <k@kainoa.me>",
+      "messages": [],
+      "total_additions": 34,
+      "total_deletions": 28,
+      "accepted_lines": 34,
+      "overriden_lines": 0
+    }
+  }
+}
